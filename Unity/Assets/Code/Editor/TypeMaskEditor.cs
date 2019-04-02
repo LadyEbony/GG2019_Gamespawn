@@ -50,11 +50,16 @@ public class TypeMaskEditor : PropertyDrawer{
       rect.position = position.position + new Vector2(0, i * base.GetPropertyHeight(property, label));
 
       // Get option value
-      optionMask = SetBit(optionMask, 
-        EditorGUI.Toggle(rect, types[i].ToString(), (optionMask & (1 << i)) > 0)
-        ? 1 : 0, 
-        i
-      );
+      if (!Application.isPlaying) {
+        optionMask = SetBit(optionMask,
+          EditorGUI.Toggle(rect, types[i], (optionMask & (1 << i)) > 0)
+          ? 1 : 0,
+          i
+        );
+      } else {
+        EditorGUI.LabelField(rect, types[i]);
+      }
+
     }
 
     options = MaskToOption(container, optionMask);
@@ -73,9 +78,7 @@ public class TypeMaskEditor : PropertyDrawer{
     if (dict == null) dict = new Dictionary<TypeMask, TypeContainer>();
     if (!dict.TryGetValue(typeMask, out value)) {
 
-      var types = typeMask.baseType.Assembly.GetTypes()
-                .Where(t => t.IsSubclassOf(typeMask.baseType))
-                .ToArray();
+      var types = SubTypes.GetSubTypes(typeMask.baseType);
       value = new TypeContainer(types);
       dict.Add(typeMask, value);
     }

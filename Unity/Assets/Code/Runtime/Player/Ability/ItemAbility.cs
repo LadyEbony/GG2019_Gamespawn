@@ -18,19 +18,20 @@ public static class ItemHolder{
     holder.Add(player, item);
     held.Add(item, player);
 
+    // item manipulation
     var rb = item.Rigidbody;
     rb.useGravity = false;
     rb.velocity = Vector3.zero;
     rb.angularVelocity = Vector3.zero;
+
+    // interaction manipulation
+    player.Interactive.DisableInteraction(typeof(Item));
   }
 
   public static void Remove(ItemAbility player){
     Item item;
     if (holder.TryGetValue(player, out item)) {
-      item.Rigidbody.useGravity = true;
-
-      holder.Remove(player);
-      held.Remove(item);
+      RemoveHelper(player, item);
     } else {
       Debug.LogErrorFormat("{0} does not an item but you are trying to remove it.", player);
     }
@@ -39,13 +40,21 @@ public static class ItemHolder{
   public static void Remove(Item item) {
     ItemAbility player;
     if (held.TryGetValue(item, out player)) {
-      item.Rigidbody.useGravity = true;
-
-      holder.Remove(player);
-      held.Remove(item);
+      RemoveHelper(player, item);
     } else {
       Debug.LogErrorFormat("{0} does not an owner but you are trying to remove it.", item);
     }
+  }
+
+  private static void RemoveHelper(ItemAbility player, Item item){
+    // item manipulation
+    item.Rigidbody.useGravity = true;
+
+    // interaction manipulation
+    player.Interactive.EnableInteraction(typeof(Item));
+
+    holder.Remove(player);
+    held.Remove(item);
   }
 
   public static Item Has(ItemAbility player){

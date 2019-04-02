@@ -18,12 +18,18 @@ public class InteractiveAbility : PlayerAbility {
   [TypeMask(typeof(Interactive), false)]
   [SerializeField]
   private string m_targets;
-  private Type[] typeTargets;
+  private Dictionary<Type, int> interactTargets;
 
   static Dictionary<string, Type> _interactConversion;
   static Dictionary<string, Type> interactConversion { 
     get {
-      return _interactConversion ?? (_interactConversion = new Dictionary<string, Type>());
+      if (_interactConversion == null){
+        _interactConversion = new Dictionary<string, Type>();
+        foreach(var type in SubTypes.GetSubTypes(typeof(Interactive))){
+          _interactConversion.Add(type.ToString(), type);
+        }
+      }
+      return _interactConversion;
     }
   }
 
@@ -31,17 +37,14 @@ public class InteractiveAbility : PlayerAbility {
     // Convert strings into Types
     // If we do not include StringSplitOptions, an empty string will return an array of size 1
     var ts = m_targets.Split(new char[] { '|' }, System.StringSplitOptions.RemoveEmptyEntries );
-    typeTargets = new Type[ts.Length];
 
-    string t;
-    Type value;
-    for(var i = 0; i < ts.Length; i++){
-      t = ts[i];
-      if(!interactConversion.TryGetValue(t, out value)) {  // Cache the GetType
-        value = typeof(Interactive).Assembly.GetType(t);
-        interactConversion.Add(t, value);
-      }
-      typeTargets[i] = value;
+    interactTargets = new Dictionary<Type, int>();
+    foreach(var type in interactConversion.Values){
+      interactTargets.Add(type, 1);                   // any value above 0 means no interaction
+    }
+
+    foreach(var stype in ts){
+      interactTargets[interactConversion[stype]] = 0; // value of 0 means interaction
     }
 
   }
@@ -57,7 +60,9 @@ public class InteractiveAbility : PlayerAbility {
     float actDist = float.MaxValue;
     float temp;
 
-    foreach (var type in typeTargets){
+    foreach (var type in interactTargets.Keys) {
+      if (interactTargets[type] != 0) continue;
+
       list = GlobalTypeList<Interactive>.GetTypeList(type);
       if (list == null) continue;
       foreach(var entity in list){
@@ -78,6 +83,18 @@ public class InteractiveAbility : PlayerAbility {
 
     if (focus != null){
       focus.Select();
+    }
+  }
+
+  public void DisableInteraction(Type type){
+    if (type.IsSubclassOf(typeof(Interactive))){
+      interactTargets[type] += 1;
+    }
+  }
+
+  public void EnableInteraction(Type type) {
+    if (type.IsSubclassOf(typeof(Interactive))) {
+      interactTargets[type] -= 1;
     }
   }
 
