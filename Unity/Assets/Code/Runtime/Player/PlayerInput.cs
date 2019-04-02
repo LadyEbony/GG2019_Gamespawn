@@ -32,6 +32,11 @@ public class PlayerInput : MonoBehaviour
     public bool IsDown(float duration){
       return state && duration >= this.duration;
     }
+
+    public bool IsUp(){
+      return !state && duration == 0.0f;
+    }
+
   }
 
   public static PlayerInput instance{ get; private set; }

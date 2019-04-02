@@ -5,6 +5,9 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public class PlayerController : MonoBehaviour {
+
+  public PlayerAbility MouseOveride;
+
   private NavMeshAgent nva;
   private PlayerAbility[] abilities;
 

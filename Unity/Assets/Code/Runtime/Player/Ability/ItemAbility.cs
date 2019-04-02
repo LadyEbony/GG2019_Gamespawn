@@ -72,15 +72,12 @@ public static class ItemHolder{
 
 public class ItemAbility : PlayerAbility {
 
-  [Header("Pickup/Hold")]
+  [Header("Hand (Visual)")]
   [SerializeField] private Transform handTransform;
-  [SerializeField] private Transform pickupTransform;
-  [SerializeField] private float pickupRadius = 1f;
 
   [Header("Throw")]
   [SerializeField] private float throwForce;
   [SerializeField] private float throwTimer;
-  private bool freshInput = true;
   private bool throwing = false;
 
   public override void UpdateSimulate(PlayerController pc) {
@@ -91,80 +88,58 @@ public class ItemAbility : PlayerAbility {
   }
 
   public override void FixedSimulate(PlayerController pc) {
-    var input = PlayerInput.instance.eInput;
+    if (pc.MouseOveride && pc.MouseOveride != this) return;
+
+    var l_input = PlayerInput.instance.lbInput;
+    var r_input = PlayerInput.instance.rbInput;
 
     if (!ItemHolder.Contains(this)){                  // No item. Find item
-      if (input.state && input.duration == 0.0f) {    // Fresh E input
+      if (l_input.IsDown()) {    // Fresh E input
         Pickup();
-        freshInput = false;
       }
-    } else {                                          // Has item
-      if (freshInput){ 
-        if (input.state && input.duration >= throwTimer && !throwing) {
-          BeginThrow();
-          throwing = true;
-        } else if (!input.state && input.duration == 0.0f) {
-          if (throwing) Throw(pc.transform.forward); else Drop();
-          throwing = false;
-        }
-      } else if (!input.state && input.duration == 0.0f){
-        freshInput = true;
+    } else {  // Has item
+      if (l_input.IsDown()){
+        Drop();
+      } else if (r_input.IsDown()){
+        PreThrow();
+      } 
+      
+      if (throwing && r_input.IsUp()){
+        Throw(pc.transform.rotation * Vector3.forward);
       }
     }
   }
 
   private void Pickup(){
-    var pickupPos = pickupTransform.position;
-    var items = Physics.OverlapSphere(pickupPos, pickupRadius, LayerMask.GetMask("Item"));
-
-    // If there is actual items
-    if (items.Length > 0) {
-
-      // Get closest item
-      Item closest = null;
-      float sqrd = float.MaxValue;
-      float ts;
-      foreach (var i in items) {
-        ts = Vector3.SqrMagnitude(pickupPos - i.transform.position);
-        if (ts < sqrd) {
-          closest = i.GetComponent<Item>();
-          sqrd = ts;
-        }
-      }
-
-      // Sanity check
-      if (closest) {
-        Debug.Log("Found closest");
-        var owner = ItemHolder.Has(closest);
-
-        // Stealing item
-        if (owner) ItemHolder.Remove(owner);
-
-        // Take item
-        ItemHolder.Add(this, closest);
+    var act = Interactive.Focus;
+    if (act){
+      var item = act as Item;
+      if (item) {
+        var owner = ItemHolder.Has(item);
+        if (owner) ItemHolder.Remove(item);
+        ItemHolder.Add(this, item);
       }
     }
   }
 
-  private void BeginThrow(){
-    PlayerInput.instance.DisableMovement++;
+  private void Drop() {
+    if (throwing){
+      throwing = false;
+      PlayerInput.instance.DisableMovement--;
+    }
+
+    ItemHolder.Remove(this);
   }
 
-  private void Drop() {
-    ItemHolder.Remove(this);
+  private void PreThrow() {
+    throwing = true;
+    PlayerInput.instance.DisableMovement++;
   }
 
   private void Throw(Vector3 playerDirection) {
     var item = ItemHolder.Has(this);
     item.Rigidbody.AddForce(playerDirection * throwForce, ForceMode.Impulse);
 
-    PlayerInput.instance.DisableMovement--;
-    ItemHolder.Remove(this);
+    Drop();
   }
-
-  private void OnDrawGizmos() {
-    Gizmos.color = Color.green;
-    Gizmos.DrawWireSphere(pickupTransform.position, pickupRadius);
-  }
-
 }
