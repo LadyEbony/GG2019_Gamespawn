@@ -8,21 +8,21 @@ namespace GameSpawn {
     public Vector3 center = Vector3.zero;
     public float radius = 1f;
 
-    private float scaledRadius{
+    public float scaledRadius{
       get {
         var s = transform.lossyScale;
         return radius * Mathf.Max(s.x, s.y, s.z);
       }
     }
 
-    private float scaledSqrRadius {
+    public float scaledSqrRadius {
       get {
         var sRad = scaledRadius;
         return sRad * sRad;
       }
     }
 
-    private Vector3 offsetCenter {
+    public Vector3 offsetCenter {
       get {
         return transformPosition + center;
       }
@@ -37,16 +37,19 @@ namespace GameSpawn {
       return sqrDistance < scaledSqrRadius;
     }
 
-    public bool Intersect(SphereTriggerBounds other, out float sqrDistance){
-      sqrDistance = Vector3.SqrMagnitude(offsetCenter - other.offsetCenter);
-      var radius = scaledRadius + other.scaledRadius;
-      return sqrDistance < scaledRadius * scaledRadius;
-    }
-
     public override void OnDrawGizmosSelected() {
       Gizmos.color = Color.green;
       Gizmos.DrawWireSphere(offsetCenter, scaledRadius);
     }
 
   }
+
+  public static partial class BoundCollider{
+    public static bool Intersect(SphereTriggerBounds a, SphereTriggerBounds b, out float sqrDistance) {
+      sqrDistance = Vector3.SqrMagnitude(a.offsetCenter - b.offsetCenter);
+      var radius = a.scaledRadius + b.scaledRadius;
+      return sqrDistance < radius * radius;
+    }
+  }
+
 }

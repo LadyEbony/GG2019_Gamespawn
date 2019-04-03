@@ -27,4 +27,9 @@ public class Item :  Interactive {
     Material.SetColor("_Color", Color.white);
   }
 
+  public void ResetRigidbody(){
+    Rigidbody.velocity = Vector3.zero;
+    Rigidbody.angularVelocity = Vector3.zero;
+  }
+
 }

@@ -19,10 +19,8 @@ public static class ItemHolder{
     held.Add(item, player);
 
     // item manipulation
-    var rb = item.Rigidbody;
-    rb.useGravity = false;
-    rb.velocity = Vector3.zero;
-    rb.angularVelocity = Vector3.zero;
+    item.Rigidbody.useGravity = false;
+    item.ResetRigidbody();
 
     // interaction manipulation
     player.Interactive.DisableInteraction(typeof(Item));
@@ -49,6 +47,7 @@ public static class ItemHolder{
   private static void RemoveHelper(ItemAbility player, Item item){
     // item manipulation
     item.Rigidbody.useGravity = true;
+    item.ResetRigidbody();
 
     // interaction manipulation
     player.Interactive.EnableInteraction(typeof(Item));
@@ -89,14 +88,24 @@ public class ItemAbility : PlayerAbility {
   [SerializeField] private float throwTimer;
   private bool throwing = false;
 
-  public override void UpdateSimulate(PlayerController pc) {
+  public override void UpdateSimulate(PlayerController pc, bool selected) {
     Item item = ItemHolder.Has(this);
     if (item) {
-      item.transform.position = handTransform.position;
+      var it = item.transform;
+      it.position = handTransform.position;
+      it.rotation = handTransform.rotation;
     }
   }
 
-  public override void FixedSimulate(PlayerController pc) {
+  public override void FixedSimulate(PlayerController pc, bool selected) {
+    if (!selected){
+      if (throwing){
+        throwing = false;
+        pc.DisableMovement--;
+      }
+      return;
+    }
+
     if (pc.MouseOveride && pc.MouseOveride != this) return;
 
     var l_input = PlayerInput.instance.lbInput;
@@ -104,22 +113,22 @@ public class ItemAbility : PlayerAbility {
 
     if (!ItemHolder.Contains(this)){                  // No item. Find item
       if (l_input.IsDown()) {    // Fresh E input
-        Pickup();
+        Pickup(pc);
       }
     } else {  // Has item
       if (l_input.IsDown()){
-        Drop();
+        Drop(pc);
       } else if (r_input.IsDown()){
-        PreThrow();
+        PreThrow(pc);
       } 
       
       if (throwing && r_input.IsUp()){
-        Throw(pc.transform.rotation * Vector3.forward);
+        Throw(pc);
       }
     }
   }
 
-  private void Pickup(){
+  private void Pickup(PlayerController pc) {
     var act = Interactive.Focus;
     if (act){
       var item = act as Item;
@@ -131,24 +140,25 @@ public class ItemAbility : PlayerAbility {
     }
   }
 
-  private void Drop() {
+  private void Drop(PlayerController pc) {
     if (throwing){
       throwing = false;
-      PlayerInput.instance.DisableMovement--;
+      pc.DisableMovement--;
     }
 
     ItemHolder.Remove(this);
   }
 
-  private void PreThrow() {
+  private void PreThrow(PlayerController pc) {
     throwing = true;
-    PlayerInput.instance.DisableMovement++;
+    pc.DisableMovement++;
   }
 
-  private void Throw(Vector3 playerDirection) {
+  private void Throw(PlayerController pc) {
+    var direction = pc.transform.rotation * Vector3.forward;
     var item = ItemHolder.Has(this);
-    item.Rigidbody.AddForce(playerDirection * throwForce, ForceMode.Impulse);
+    item.Rigidbody.AddForce(direction * throwForce, ForceMode.Impulse);
 
-    Drop();
+    Drop(pc);
   }
 }

@@ -41,16 +41,23 @@ public class PlayerInput : MonoBehaviour
 
   public static PlayerInput instance{ get; private set; }
 
+  // Axis
   public AxisInput horizontalInput;
   public AxisInput verticalInput;
 
+  // Abilites
   public ButtonInput eInput;
   public ButtonInput lbInput;
   public ButtonInput rbInput;
 
+  // Switch
+  public ButtonInput oneInput;
+  public ButtonInput twoInput;
+  public ButtonInput threeInput;
+  public ButtonInput tabInput;
+
   public int DisableInput = 0;
-  public int DisableMovement = 0;
-  public int DisableRotation = 0;
+  public int DisableSwitch = 0;
 
   private void Awake() {
     // Set singleton
@@ -66,6 +73,11 @@ public class PlayerInput : MonoBehaviour
     eInput = new ButtonInput("Fire3");
     lbInput = new ButtonInput("Fire1");
     rbInput = new ButtonInput("Fire2");
+
+    oneInput = new ButtonInput("One");
+    twoInput = new ButtonInput("Two");
+    threeInput = new ButtonInput("Three");
+    tabInput = new ButtonInput("Tab");
   }
 
   private void FixedUpdate() {
@@ -75,6 +87,11 @@ public class PlayerInput : MonoBehaviour
     UpdateButtonInput(ref eInput);
     UpdateButtonInput(ref lbInput);
     UpdateButtonInput(ref rbInput);
+
+    UpdateButtonInput(ref oneInput);
+    UpdateButtonInput(ref twoInput);
+    UpdateButtonInput(ref threeInput);
+    UpdateButtonInput(ref tabInput);
   }
 
   private void UpdateAxisInput(ref AxisInput input){
@@ -92,18 +109,6 @@ public class PlayerInput : MonoBehaviour
     }
 
     input.state = state;
-  }
-
-  public Vector3 GetMovementInput {
-    get {
-      return DisableMovement == 0 ? GetDirectionInput : Vector3.zero;
-    }
-  }
-
-  public Vector3 GetRotationInput {
-    get {
-      return DisableRotation == 0 ? GetDirectionInput : Vector3.zero;
-    }
   }
 
   public Vector3 GetDirectionInput{

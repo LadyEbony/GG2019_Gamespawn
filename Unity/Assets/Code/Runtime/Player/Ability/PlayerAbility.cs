@@ -16,11 +16,11 @@ public abstract class PlayerAbility : MonoBehaviour
   /// Visual simulator
   /// </summary>
   /// <param name="pc"></param>
-  public virtual void UpdateSimulate(PlayerController pc) { }
+  public virtual void UpdateSimulate(PlayerController pc, bool selected) { }
 
   /// <summary>
   /// Buttion input simulator
   /// </summary>
   /// <param name="pc"></param>
-  public virtual void FixedSimulate(PlayerController pc) { }
+  public virtual void FixedSimulate(PlayerController pc, bool selected) { }
 }

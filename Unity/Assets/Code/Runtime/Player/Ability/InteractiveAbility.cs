@@ -10,7 +10,7 @@ public class InteractiveAbility : PlayerAbility {
 
   [Header("Interactive")]
   [SerializeField] private Interactive focus;
-  [SerializeField] private SphereTriggerBounds interactiveBounds;
+  [SerializeField] private CylinderTriggerBounds interactiveBounds;
   public Interactive Focus { get { return focus; } }
 
 
@@ -49,11 +49,19 @@ public class InteractiveAbility : PlayerAbility {
 
   }
 
-  public override void UpdateSimulate(PlayerController pc) {
+  public override void UpdateSimulate(PlayerController pc, bool selected) {
     
   }
 
-  public override void FixedSimulate(PlayerController pc) {
+  public override void FixedSimulate(PlayerController pc, bool selected) {
+    if (!selected) {
+      if (focus){
+        focus.Deselect();
+        focus = null;
+      }
+      return;
+    }
+
     IReadOnlyCollection<Interactive> list;
 
     Interactive act = null;
@@ -66,7 +74,7 @@ public class InteractiveAbility : PlayerAbility {
       list = GlobalTypeList<Interactive>.GetTypeList(type);
       if (list == null) continue;
       foreach(var entity in list){
-        if (interactiveBounds.Intersect(entity.Bounds, out temp)) {
+        if (BoundCollider.Intersect(interactiveBounds, entity.Bounds, out temp)) {
           if (temp < actDist) {
             act = entity;
             actDist = temp;
