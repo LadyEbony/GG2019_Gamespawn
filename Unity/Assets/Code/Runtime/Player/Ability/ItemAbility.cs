@@ -18,11 +18,8 @@ public static class ItemHolder{
     holder.Add(player, item);
     held.Add(item, player);
 
-    // item manipulation
-    item.Rigidbody.useGravity = false;
-    item.ResetRigidbody();
-
-    // interaction manipulation
+    item.Pickup(player.Player);
+    
     player.Interactive.DisableInteraction(typeof(Item));
   }
 
@@ -45,11 +42,7 @@ public static class ItemHolder{
   }
 
   private static void RemoveHelper(ItemAbility player, Item item){
-    // item manipulation
-    item.Rigidbody.useGravity = true;
-    item.ResetRigidbody();
-
-    // interaction manipulation
+    item.Drop(player.Player);
     player.Interactive.EnableInteraction(typeof(Item));
 
     holder.Remove(player);
@@ -88,7 +81,7 @@ public class ItemAbility : PlayerAbility {
   [SerializeField] private float throwTimer;
   private bool throwing = false;
 
-  public override void UpdateSimulate(PlayerController pc, bool selected) {
+  public override void UpdateSimulate(bool selected) {
     Item item = ItemHolder.Has(this);
     if (item) {
       var it = item.transform;
@@ -97,7 +90,9 @@ public class ItemAbility : PlayerAbility {
     }
   }
 
-  public override void FixedSimulate(PlayerController pc, bool selected) {
+  public override void FixedSimulate(bool selected) {
+    var pc = Player;
+
     if (!selected){
       if (throwing){
         throwing = false;
@@ -128,25 +123,31 @@ public class ItemAbility : PlayerAbility {
     }
   }
 
+
   private void Pickup(PlayerController pc) {
     var act = Interactive.Focus;
-    if (act){
+    if (act) {
       var item = act as Item;
       if (item) {
         var owner = ItemHolder.Has(item);
-        if (owner) ItemHolder.Remove(item);
+        if (owner) {
+          ItemHolder.Remove(item);
+        }
         ItemHolder.Add(this, item);
       }
     }
   }
 
   private void Drop(PlayerController pc) {
-    if (throwing){
+    if (throwing) {
       throwing = false;
       pc.DisableMovement--;
     }
 
-    ItemHolder.Remove(this);
+    var item = ItemHolder.Has(this);
+    if (item) {
+      ItemHolder.Remove(item);
+    }
   }
 
   private void PreThrow(PlayerController pc) {
@@ -161,4 +162,6 @@ public class ItemAbility : PlayerAbility {
 
     Drop(pc);
   }
+
+
 }

@@ -62,7 +62,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     foreach (var ab in abilities) {
-      ab.UpdateSimulate(this, selected);
+      ab.UpdateSimulate(selected);
     }
     
   }
@@ -71,7 +71,7 @@ public class PlayerController : MonoBehaviour {
     var selected = PlayerSwitch.instance.Selected == this;
 
     foreach (var ab in abilities){
-      ab.FixedSimulate(this, selected);
+      ab.FixedSimulate(selected);
     }
   }
 

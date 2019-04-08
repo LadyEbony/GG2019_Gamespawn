@@ -49,14 +49,16 @@ public class InteractiveAbility : PlayerAbility {
 
   }
 
-  public override void UpdateSimulate(PlayerController pc, bool selected) {
+  public override void UpdateSimulate(bool selected) {
     
   }
 
-  public override void FixedSimulate(PlayerController pc, bool selected) {
+  public override void FixedSimulate(bool selected) {
+    var pc = Player;
+
     if (!selected) {
       if (focus){
-        focus.Deselect();
+        focus.Deselect(pc);
         focus = null;
       }
       return;
@@ -84,13 +86,13 @@ public class InteractiveAbility : PlayerAbility {
     }
 
     if (focus != null && focus != act){
-      focus.Deselect();  
+      focus.Deselect(pc);  
     }
 
     focus = act;
 
     if (focus != null){
-      focus.Select();
+      focus.Select(pc);
     }
   }
 

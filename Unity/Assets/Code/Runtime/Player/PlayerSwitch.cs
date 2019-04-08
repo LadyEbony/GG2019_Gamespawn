@@ -18,6 +18,8 @@ public class PlayerSwitch : MonoBehaviour
   }
 
   private void Start() {
+    if (characters == null) characters = new List<PlayerController>();
+
     if (characters.Count == 0){
       Debug.Log("No player controllers in scene");
     } else {

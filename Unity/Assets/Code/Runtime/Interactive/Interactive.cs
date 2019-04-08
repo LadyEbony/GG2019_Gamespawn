@@ -21,13 +21,15 @@ public abstract class Interactive: MonoBehaviour {
     GlobalTypeList<Interactive>.Remove(this);
   }
 
-  public abstract void Interact(PlayerController pc);
-
-  public virtual void Select(){
+  public virtual void Interact(PlayerController pc) {
     
   }
 
-  public virtual void Deselect() {
+  public virtual void Select(PlayerController pc){
+    
+  }
+
+  public virtual void Deselect(PlayerController pc) {
 
   }
 
