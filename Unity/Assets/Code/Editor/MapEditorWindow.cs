@@ -34,6 +34,9 @@ public class MapEditorWindow : EditorWindow
   private bool onView;
   private bool previousOrtho;
 
+  /// <summary>
+  /// Editor Window
+  /// </summary>
   private void OnGUI() {
     if (instance == null){
       var currentScene = SceneManager.GetActiveScene();
@@ -63,8 +66,7 @@ public class MapEditorWindow : EditorWindow
     if ((instance.length != length_scr && length_scr > 0) || (instance.width != width_scr && width_scr > 0)){
       EditorGUILayout.BeginHorizontal();
       if(GUILayout.Button("Apply")){
-        instance.length = length_scr;
-        instance.width = width_scr;
+        instance.Resize(length_scr, width_scr);
       }
 
       if (GUILayout.Button("Reset")) {
@@ -96,11 +98,16 @@ public class MapEditorWindow : EditorWindow
 
   }
 
+  // Drag variables
   private bool dragActiveBox;
   private int dragSetState;
   private MapVector dragStartIndex;
   private MapVector dragEndIndex;
 
+  /// <summary>
+  /// Scene window
+  /// </summary>
+  /// <param name="view"></param>
   private void OnSceneGUI(SceneView view){
     if (instance == null) return;
 
@@ -110,8 +117,14 @@ public class MapEditorWindow : EditorWindow
     }
   }
 
+  #region Scene Draw
+
+  /// <summary>
+  /// Returns if display enabled. Sets up initialize values between display changes.
+  /// </summary>
+  /// <param name="view"></param>
+  /// <returns></returns>
   private bool PreDraw(SceneView view){
-    // On button. Acts like an Init()
     if (onView) {
       if (instance.display) {       // On display
         previousOrtho = view.orthographic;
@@ -124,67 +137,70 @@ public class MapEditorWindow : EditorWindow
     }
 
     return instance.display;
-
   }
 
+  /// <summary>
+  /// Draws map onto the scene view.
+  /// </summary>
+  /// <param name="view"></param>
   private void DrawMap(SceneView view) { 
     // Get basic variables
     float bot = -(instance.width / 2) * instance.cellsize;
-    float top = -bot;
     float left = -(instance.length / 2) * instance.cellsize;
-    float right = -left;
     float cell = instance.cellsize;
 
     if (cell <= 0.0f) return;
 
     // Draw boxes
-    int i = 0;
     Color faceColor;
 
     // Main draw
-    for (var y = bot; y < top; y += cell) {
-      for (var x = left; x < right; x += cell) {
-        faceColor = instance.GetFillStatus(i) ? Color.red : Color.clear;
-
-        Handles.DrawSolidRectangleWithOutline(
-          new Vector3[] { new Vector3(x, 0, y), new Vector3(x + cell, 0, y),
-                          new Vector3(x + cell, 0, y + cell), new Vector3(x, 0, y + cell) },
-          faceColor, Color.black);
-
-        i++;
-      }
+    for(var i = 0; i < instance.GetSize(); i++){
+      faceColor = instance.GetFillStatus(i) ? Color.red : Color.clear;
+      DrawSolidRectangle(instance.GetMapPosition(i), left, bot, cell, faceColor);
     }
 
     // Box draw
     if (dragActiveBox) {
-      foreach (var k in instance.GetRegionList(dragStartIndex, dragEndIndex)) {
-        var x = left + k.x * cell;
-        var y = bot + k.z * cell;
-
+      foreach (var m in instance.GetRegionList(dragStartIndex, dragEndIndex)) {
         faceColor = dragSetState == 0 ? Color.white : Color.red;
-
-        Handles.DrawSolidRectangleWithOutline(
-            new Vector3[] { new Vector3(x, 0, y), new Vector3(x + cell, 0, y),
-                          new Vector3(x + cell, 0, y + cell), new Vector3(x, 0, y + cell) },
-            faceColor, Color.black);
+        DrawSolidRectangle(m, left, bot, cell, faceColor);
       }
     }
   }
 
+  /// <summary>
+  /// Draw a solid box with a black outline.
+  /// </summary>
+  /// <param name="m"></param>
+  /// <param name="left"></param>
+  /// <param name="bot"></param>
+  /// <param name="cell"></param>
+  /// <param name="color"></param>
+  private void DrawSolidRectangle(MapVector m, float left, float bot, float cell, Color color){
+    var x = left + m.x * cell;
+    var z = bot + m.z * cell;
+
+    Handles.DrawSolidRectangleWithOutline(
+            new Vector3[] { new Vector3(x, 0, z), new Vector3(x + cell, 0, z),
+                          new Vector3(x + cell, 0, z + cell), new Vector3(x, 0, z + cell) },
+            color, Color.black);
+  }
+
   private void RecieveInput(SceneView view){
-    // Disables all typical input
+    // Disables all standard input
     HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
     view.orthographic = true;
 
+    // Get basic variables
     float bot = -(instance.width / 2) * instance.cellsize;
     float left = -(instance.length / 2) * instance.cellsize;
     float cell = instance.cellsize;
-
-    // Receive paint input
     Event e = Event.current;
     
     // Mouse
     if (e.isMouse) {
+      // Only works in ortho mode. This is why we force it.
       Vector3 mousePosition = HandleUtility.GUIPointToWorldRay(e.mousePosition).origin;
 
       // Left click down and drag
@@ -214,17 +230,22 @@ public class MapEditorWindow : EditorWindow
       // Left click up
       else if (e.type == EventType.MouseUp) {
         if (dragActiveBox) {
+          // Set all blocks
           foreach (var k in instance.GetRegionList(dragStartIndex, dragEndIndex)) {
             instance.SetFillStatus(instance.GetIndex(k.x, k.z), dragSetState);
           }
+          e.Use();
         }
         dragActiveBox = false;
 
-        e.Use();
         view.Repaint();
       }
     }
   }
+
+  #endregion
+
+  #region Map Generation
 
   private struct Box{
     public Vector2 position;
@@ -413,4 +434,6 @@ public class MapEditorWindow : EditorWindow
     return Vector3.zero;
   }
 
+
+  #endregion
 }

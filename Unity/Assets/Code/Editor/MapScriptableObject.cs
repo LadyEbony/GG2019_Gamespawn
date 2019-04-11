@@ -16,8 +16,7 @@ public struct MapVector {
   }
 }
 
-public class MapScriptableObject : ScriptableObject
-{
+public class MapScriptableObject : ScriptableObject {
   public int length = 8;
   public int width = 8;
   public int height = 2;
@@ -29,32 +28,47 @@ public class MapScriptableObject : ScriptableObject
   public Mesh baseWallMesh;
   public Material baseWallMaterial;
 
-  public bool GetFillStatus(int index){
+  #region Get Fill Statuses
+
+  public bool GetFillStatus(int index) {
     return (filled[index / 32] & (1 << (index % 32))) != 0;
   }
 
-  public void ToggleFillStatus(int index){
+  public void ToggleFillStatus(int index) {
     filled[index / 32] = filled[index / 32] ^ (1 << (index % 32));
   }
 
-  public void SetFillStatus(int index, int state){
+  public void SetFillStatus(int index, int state) {
     filled[index / 32] = (filled[index / 32] & ~(1 << (index % 32))) | (state << (index % 32));
   }
 
-  public List<MapVector> GetRegionList(MapVector start, MapVector end){
+  public List<MapVector> GetRegionList() {
     var list = new List<MapVector>();
 
-    MapVector s = new MapVector(MinInt(start.x, end.x), MinInt(start.z, end.z));
-    MapVector e = new MapVector(MaxInt(start.x, end.x), MaxInt(start.z, end.z));
+    for (var i = 0; i <= length * width; i++) {
+      if (GetFillStatus(i))
+        list.Add(GetMapPosition(i));
+    }
 
-    for(var x = s.x; x <= e.x; x++){
-      for (var z = s.z; z <= e.z; z++){
+    return list;
+  }
+
+  public List<MapVector> GetRegionList(MapVector start, MapVector end) {
+    var list = new List<MapVector>();
+
+    MapVector s = new MapVector(MathfExtender.MinInt(start.x, end.x), MathfExtender.MinInt(start.z, end.z));
+    MapVector e = new MapVector(MathfExtender.MaxInt(start.x, end.x), MathfExtender.MaxInt(start.z, end.z));
+
+    for (var x = s.x; x <= e.x; x++) {
+      for (var z = s.z; z <= e.z; z++) {
         list.Add(new MapVector(x, z));
       }
     }
 
     return list;
   }
+
+  #endregion
 
   #region Directional Check
 
@@ -72,7 +86,7 @@ public class MapScriptableObject : ScriptableObject
     return -1;
   }
 
-  public int GetRightDirectionIndex(int index){
+  public int GetRightDirectionIndex(int index) {
     if ((index / width) == ((index + 1) / width))
       return index + 1;
     return -1;
@@ -100,49 +114,74 @@ public class MapScriptableObject : ScriptableObject
 
   #region Positional Checks
 
-  public int GetIndex(int x, int z){
+  public int GetIndex(int x, int z) {
     return x + (z * length);
   }
 
-  public bool WithinBox(int x, int z){
+  public int GetIndex(int x, int z, int length) {
+    return x + (z * length);
+  }
+
+  public bool WithinBox(int x, int z) {
     return x >= 0 && x < length && z >= 0 && z < width;
   }
 
-  public bool WithinBox(int index){
-    return index >= 0 && index < length * width;
-  }
-
-  public Vector2 GetPosition(int index){
-    return new Vector2(GetLength(index), GetWidth(index));
-  }
-
-  public MapVector GetMapPosition(int index){
+  public MapVector GetMapPosition(int index) {
     return new MapVector(GetLength(index), GetWidth(index));
+  }
+
+  public Vector2 GetPosition(int index) {
+    return new Vector2(GetLength(index), GetWidth(index));
   }
 
   public Vector2 GetPositionOffset(int index) {
     return GetPosition(index) - new Vector2(length / 2, width / 2);
   }
 
-  public int GetLength(int index){
+  public int GetLength(int index) {
     return index % length;
   }
 
-  public int GetWidth(int index){
-    return index / width;
+  public int GetWidth(int index) {
+    return index / length;
+  }
+
+  public int GetSize() {
+    return length * width;
   }
 
   #endregion
 
-  #region Helper
+  #region Resizer
 
-  private int MinInt(int a, int b){
-    return a < b ? a : b;
-  }
+  public void Resize(int length, int width){
+    var n_size = length * width;
 
-  private int MaxInt(int a, int b) {
-    return a > b ? a : b;
+    var x_offset = (this.length - length) / 2;
+    var y_offset = (this.width - width) / 2;
+
+    int[] filled = new int[Mathf.CeilToInt(n_size / 32f)];
+
+    int xi, yi, i;
+
+    for(var x = 0; x < length; x++){
+      for(var y = 0; y < width; y++){
+        xi = x + x_offset;
+        yi = y + y_offset;
+        if (xi >= 0 && xi < this.length && yi >= 0 && yi < this.width){
+          if (GetFillStatus(GetIndex(xi, yi))) {
+            i = GetIndex(x, y, length);
+            filled[i / 32] |= 1 << (i % 32);
+          }
+        }
+      }
+    }
+
+    this.filled = filled;
+    this.length = length;
+    this.width = width;
   }
 
   #endregion
+
 }
