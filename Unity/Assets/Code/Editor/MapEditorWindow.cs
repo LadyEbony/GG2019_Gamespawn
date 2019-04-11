@@ -24,9 +24,15 @@ public class MapEditorWindow : EditorWindow
     SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
   }
 
+  // Main variable
   MapScriptableObject instance;
 
+  // Safety check for size conversion
   private int length_scr, width_scr;
+
+  // Remembering pre-show-map state
+  private bool onView;
+  private bool previousOrtho;
 
   private void OnGUI() {
     if (instance == null){
@@ -78,6 +84,7 @@ public class MapEditorWindow : EditorWindow
     EditorGUILayout.Separator();
     if (GUILayout.Button(instance.display ? "Hide Map" : "Show Map")) {
       instance.display = !instance.display;
+      onView = true;
     }
     EditorGUILayout.Separator();
     if (GUILayout.Button("Create Map")){
@@ -89,19 +96,38 @@ public class MapEditorWindow : EditorWindow
 
   }
 
-  private int selectedBox = -1;
+  private bool dragActiveBox;
+  private int dragSetState;
+  private MapVector dragStartIndex;
+  private MapVector dragEndIndex;
 
   private void OnSceneGUI(SceneView view){
     if (instance == null) return;
 
-    DrawMap();
+    if (PreDraw(view)) {
+      DrawMap(view);
+      RecieveInput(view);
+    }
   }
 
-  private void DrawMap(){
-    if (!instance.display) return;
+  private bool PreDraw(SceneView view){
+    // On button. Acts like an Init()
+    if (onView) {
+      if (instance.display) {       // On display
+        previousOrtho = view.orthographic;
+        view.orthographic = false;
+      } else {                      // On 
+        view.orthographic = previousOrtho;
+      }
 
-    Handles.color = Color.red;
+      onView = false;
+    }
 
+    return instance.display;
+
+  }
+
+  private void DrawMap(SceneView view) { 
     // Get basic variables
     float bot = -(instance.width / 2) * instance.cellsize;
     float top = -bot;
@@ -115,6 +141,7 @@ public class MapEditorWindow : EditorWindow
     int i = 0;
     Color faceColor;
 
+    // Main draw
     for (var y = bot; y < top; y += cell) {
       for (var x = left; x < right; x += cell) {
         faceColor = instance.GetFillStatus(i) ? Color.red : Color.clear;
@@ -128,24 +155,80 @@ public class MapEditorWindow : EditorWindow
       }
     }
 
+    // Box draw
+    if (dragActiveBox) {
+      foreach (var k in instance.GetRegionList(dragStartIndex, dragEndIndex)) {
+        var x = left + k.x * cell;
+        var y = bot + k.z * cell;
+
+        faceColor = dragSetState == 0 ? Color.white : Color.red;
+
+        Handles.DrawSolidRectangleWithOutline(
+            new Vector3[] { new Vector3(x, 0, y), new Vector3(x + cell, 0, y),
+                          new Vector3(x + cell, 0, y + cell), new Vector3(x, 0, y + cell) },
+            faceColor, Color.black);
+      }
+    }
+  }
+
+  private void RecieveInput(SceneView view){
+    // Disables all typical input
+    HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+    view.orthographic = true;
+
+    float bot = -(instance.width / 2) * instance.cellsize;
+    float left = -(instance.length / 2) * instance.cellsize;
+    float cell = instance.cellsize;
+
     // Receive paint input
     Event e = Event.current;
-    Vector3 mousePosition = HandleUtility.GUIPointToWorldRay(e.mousePosition).origin;
+    
+    // Mouse
+    if (e.isMouse) {
+      Vector3 mousePosition = HandleUtility.GUIPointToWorldRay(e.mousePosition).origin;
 
-    // Left click
-    if (e.isMouse && e.type == EventType.MouseDown) {
-      // Translate mouse position to cell position
-      var x = Mathf.FloorToInt((mousePosition.x - left) / cell);
-      var y = Mathf.FloorToInt((mousePosition.z - bot) / cell);
+      // Left click down and drag
+      if (e.type == EventType.MouseDown || e.type == EventType.MouseDrag) {
+        // Translate mouse position to cell position
+        var x = Mathf.FloorToInt((mousePosition.x - left) / cell);
+        var z = Mathf.FloorToInt((mousePosition.z - bot) / cell);
 
-      // Check if within zone
-      if (x >= 0 && x < instance.length && y >= 0 && y < instance.width) {
-        // Toggle
-        i = x + (y * instance.width);
-        instance.filled[i / 32] = instance.filled[i / 32] ^ (1 << (i % 32));
+        // Check if within zone
+        if (instance.WithinBox(x, z)) {
+          // Click
+          if (e.type == EventType.MouseDown) {
+            dragActiveBox = true;
+            dragSetState = instance.GetFillStatus(instance.GetIndex(x, z)) ? 0 : 1;
+            dragStartIndex = new MapVector(x, z);
+            dragEndIndex = new MapVector(x, z);
+          }
+          // Drag
+          else {
+            dragEndIndex = new MapVector(x, z);
+          }
+          e.Use();
+          view.Repaint();
+        }
+
       }
+      // Left click up
+      else if (e.type == EventType.MouseUp) {
+        if (dragActiveBox) {
+          foreach (var k in instance.GetRegionList(dragStartIndex, dragEndIndex)) {
+            instance.SetFillStatus(instance.GetIndex(k.x, k.z), dragSetState);
+          }
+        }
+        dragActiveBox = false;
 
+        e.Use();
+        view.Repaint();
+      }
     }
+  }
+
+  private struct Box{
+    public Vector2 position;
+    public Vector2 size;
   }
 
   private void CreateMap(){
@@ -161,82 +244,128 @@ public class MapEditorWindow : EditorWindow
     if (mapParent) map.transform.SetParent(mapParent);
     mapParent = map.transform;
 
-    // Create boxes
-    // Create vars
-    List<List<int>> zones = new List<List<int>>();
+    // Iterach each zone
+    // Make horizontal groups
+    // Then make vertical groups
+
+    // Prepare for horizontal grouping
+    Dictionary<int, List<int>> horgroups = new Dictionary<int, List<int>>();
     Dictionary<int, bool> taken = new Dictionary<int, bool>();
+    var length = instance.length;
+    var width = instance.width;
+    var height = instance.height;
 
-    int[] filled = instance.filled;
-    int length = instance.length;
-    int width = instance.width;
-
-    for(var i = 0; i < length * width; i++){
-      if (instance.GetFillStatus(i)) taken.Add(i, false);
+    for (var i = 0; i < length * width; i++) {
+      if (instance.GetFillStatus(i)) taken.Add(i, true);
     }
 
-    // Iterate each filled. For each empty, check all zones
+    // Get horizontal groups
     foreach(var i in taken.Keys.ToArray()){
-      if (taken[i] == false){
-        // New zone
-        var z = new List<int>();
-        var n = new List<int>();
+      if (taken[i]){
+        // New horizontal
+        List<int> z = new List<int>();
+        List<int> n = new List<int>();
+
         z.Add(i);
         n.Add(i);
-        taken[i] = true;
+        taken[i] = false;
 
-        // Check all directions until all are taken
+        // Check each new horizontal until there are no more to check
         while(n.Count > 0){
-          for(var j = 0; j < 4; j++){
+          for(var j = 0; j < 2; j++){
             var k = instance.GetDirectionIndex(n[0], j);
-            if (k != -1 && instance.GetFillStatus(k) && taken[k] == false){
+            if(k != -1 && instance.GetFillStatus(k) && taken[k]){
               z.Add(k);
               n.Add(k);
-              taken[k] = true;
+              taken[k] = false;
             }
           }
           n.RemoveAt(0);
         }
+        // By sorting, we know that z[0] is the left most and z[Count - 1] is the right most
+        z.Sort();
+        horgroups.Add(z[0], z);
+      }
+    }
 
-        // Set zone
-        zones.Add(z);
+    // Reset taken to only include horgroups
+    taken.Clear();
+    foreach (var h in horgroups.Keys.ToArray()){
+      taken.Add(h, true);
+    }
+
+    // Combine horizontal groups into boxes
+    List<Box> zones = new List<Box>();
+    foreach(var i in taken.Keys.ToArray()){
+      if (taken[i]){
+        // New box
+        // i refers to position
+        // group_width refers to the box length (ya that doesn't make any sense oh well)
+        var z = new List<int>();
+        var n = new List<int>();
+        var group = horgroups[i];
+        var group_width = group[group.Count - 1] - group[0];
+        z.AddRange(group);
+        n.Add(i);
+        taken[i] = false;
+
+        // Check each new horizontal group until there are no more to check
+        while (n.Count > 0) {
+          for (var j = 2; j < 4; j++) {
+            // Accept IF the upper or bottom position of i exists
+            // If not, i cannot group with that side
+            var k = instance.GetDirectionIndex(n[0], j);
+            bool result;
+            if (k != -1 && taken.TryGetValue(k, out result)) {
+              // Accept if they have the same width (and haven't been taken yet)
+              var k_group = horgroups[k];
+              var k_width = k_group[k_group.Count - 1] - k_group[0];
+              if (result && group_width == k_width){
+                z.AddRange(k_group);
+                n.Add(k);
+                taken[k] = false;
+              }
+            }
+          }
+          n.RemoveAt(0);
+        }
+        // By sorting, z[0] is the bottom-left corner and z[Count - 1] is the top-right corner
+        z.Sort();
+        var pos = instance.GetPositionOffset(z[0]);
+        var bl = instance.GetPosition(z[0]);
+        var br = instance.GetPosition(z[z.Count - 1]) + Vector2.one;
+        zones.Add(new Box { position = pos, size = br - bl });
       }
     }
 
     var size = instance.cellsize;
-    var height = instance.height;
-
-    var halfLength = length / 2;
-    var halfWidth = width / 2;
-
     var wallLayerMask = LayerMask.NameToLayer("Wall");
 
-    // Iterate each zone
-    foreach(var l in zones){
-      foreach(var i in l){
-        var temp = new GameObject("Wall", 
+    Debug.LogFormat("Created {0} walls.", zones.Count);
+
+    foreach (var l in zones){
+      var temp = new GameObject("Wall",
           new[] { typeof(MeshRenderer), typeof(MeshFilter), typeof(BoxCollider), typeof(NavMeshModifier) });
 
-        temp.transform.SetParent(mapParent);
-        temp.gameObject.layer = wallLayerMask;
-        temp.isStatic = true;
+      temp.transform.SetParent(mapParent);
+      temp.gameObject.layer = wallLayerMask;
+      temp.isStatic = true;
 
-        var x = i % length;
-        var z = i / width;
-        var scale = new Vector3(size, height, size);
+      var scale = new Vector3(l.size.x * size, height, l.size.y * size);
+      var offset = Vector3.Scale(Vector3.one * 0.5f, scale);
 
-        temp.transform.position = new Vector3((x - halfLength) * size, 0f, (z - halfWidth) * size);
+      temp.transform.position = new Vector3(l.position.x * size, 0f, l.position.y * size) + offset;
 
-        temp.GetComponent<MeshRenderer>().sharedMaterial = instance.baseWallMaterial;
-        temp.GetComponent<MeshFilter>().sharedMesh = CloneMesh(instance.baseWallMesh, scale);
+      temp.GetComponent<MeshRenderer>().sharedMaterial = instance.baseWallMaterial;
+      temp.GetComponent<MeshFilter>().sharedMesh = CloneMesh(instance.baseWallMesh, scale);
 
-        var bc = temp.GetComponent<BoxCollider>();
-        bc.size = scale;
-        bc.center = scale / 2f;
+      var bc = temp.GetComponent<BoxCollider>();
+      bc.size = scale;
 
-        var nm = temp.GetComponent<NavMeshModifier>();
-        nm.overrideArea = true;
-        nm.area = 1;
-      } 
+      var nm = temp.GetComponent<NavMeshModifier>();
+      nm.overrideArea = true;
+      nm.area = 1;
+
     }
 
   }
@@ -246,18 +375,22 @@ public class MapEditorWindow : EditorWindow
 
     var vert = CopyArray(m.vertices);
     for (var i = 0; i < vert.Length; i++) {
-      vert[i] = Vector3.Scale(vert[i] + new Vector3(0.5f, 0.5f, 0.5f), scale);
+      vert[i] = Vector3.Scale(vert[i], scale);
     }
     m.vertices = vert;
 
     var uv = CopyArray(m.uv);
     var uv2 = CopyArray(m.uv2);
-    for(var i = 0; i < uv.Length; i++){
-      uv[i] = Vector3.Scale(uv[i], scale);
-      uv2[i] = Vector3.Scale(uv2[i], scale);
+    var normals = mesh.normals;
+    for (var i = 0; i < uv.Length; i++){
+      var uvscale = NormalToUV(scale, normals[i]);
+      uv[i] = Vector2.Scale(uv[i], uvscale);
+      uv2[i] = Vector2.Scale(uv2[i], uvscale);
     }
     m.uv = uv;
     m.uv2 = uv2;
+
+    m.RecalculateBounds();
 
     return m;
   }
@@ -267,6 +400,17 @@ public class MapEditorWindow : EditorWindow
     T[] copy = new T[length];
     System.Array.Copy(original, copy, length);
     return copy;
+  }
+
+  private Vector2 NormalToUV(Vector3 vector, Vector3 normal){
+    if (normal.Equals(Vector3.forward) || normal.Equals(Vector3.back)) {
+      return new Vector2(vector.x, vector.y);
+    } else if (normal.Equals(Vector3.up) || normal.Equals(Vector3.down)) {
+      return new Vector2(vector.x, vector.z);
+    } else if (normal.Equals(Vector3.left) || normal.Equals(Vector3.right)) {
+      return new Vector2(vector.z, vector.y);
+    }
+    return Vector3.zero;
   }
 
 }
