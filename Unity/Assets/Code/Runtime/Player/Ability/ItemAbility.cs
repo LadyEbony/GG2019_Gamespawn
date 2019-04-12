@@ -81,6 +81,14 @@ public class ItemAbility : PlayerAbility {
   [SerializeField] private float throwTimer;
   private bool throwing = false;
 
+  private void OnEnable() {
+    Interactive.EnableInteraction(typeof(Item));
+  }
+
+  private void OnDisable() {
+    Interactive.DisableInteraction(typeof(Item));
+  }
+
   public override void UpdateSimulate(bool selected) {
     Item item = ItemHolder.Has(this);
     if (item) {

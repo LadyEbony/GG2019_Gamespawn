@@ -80,8 +80,8 @@ public class MapEditorWindow : EditorWindow
     instance.cellsize = EditorGUILayout.FloatField("Cell Size", instance.cellsize);
 
     EditorGUILayout.Separator();
-    instance.baseWallMesh = (Mesh)EditorGUILayout.ObjectField("Wall Mesh", instance.baseWallMesh, typeof(Mesh), false);
-    instance.baseWallMaterial = (Material)EditorGUILayout.ObjectField("Wall Material", instance.baseWallMaterial, typeof(Material), false);
+    instance.baseWallGameobject = (GameObject)EditorGUILayout.ObjectField("Wall Prefab", instance.baseWallGameobject, typeof(GameObject), false);
+    instance.baseCeilingGameObject = (GameObject)EditorGUILayout.ObjectField("Ceiling Prefab", instance.baseCeilingGameObject, typeof(GameObject), false);
 
     EditorGUILayout.Separator();
     if (GUILayout.Button(instance.display ? "Hide Map" : "Show Map")) {
@@ -265,6 +265,11 @@ public class MapEditorWindow : EditorWindow
     if (mapParent) map.transform.SetParent(mapParent);
     mapParent = map.transform;
 
+    CreateMap(instance.baseWallGameobject, mapParent, instance.height, (i) => instance.GetFillStatus(i));
+    CreateMap(instance.baseCeilingGameObject, mapParent, 1, (i) => !instance.GetFillStatus(i));
+  }
+
+  private void CreateMap(GameObject prefab, Transform parent, float heightScale, System.Func<int, bool> compareFunc){
     // Iterach each zone
     // Make horizontal groups
     // Then make vertical groups
@@ -274,15 +279,15 @@ public class MapEditorWindow : EditorWindow
     Dictionary<int, bool> taken = new Dictionary<int, bool>();
     var length = instance.length;
     var width = instance.width;
-    var height = instance.height;
+    var height = heightScale;
 
     for (var i = 0; i < length * width; i++) {
-      if (instance.GetFillStatus(i)) taken.Add(i, true);
+      if (compareFunc(i)) taken.Add(i, true);
     }
 
     // Get horizontal groups
-    foreach(var i in taken.Keys.ToArray()){
-      if (taken[i]){
+    foreach (var i in taken.Keys.ToArray()) {
+      if (taken[i]) {
         // New horizontal
         List<int> z = new List<int>();
         List<int> n = new List<int>();
@@ -292,10 +297,10 @@ public class MapEditorWindow : EditorWindow
         taken[i] = false;
 
         // Check each new horizontal until there are no more to check
-        while(n.Count > 0){
-          for(var j = 0; j < 2; j++){
+        while (n.Count > 0) {
+          for (var j = 0; j < 2; j++) {
             var k = instance.GetDirectionIndex(n[0], j);
-            if(k != -1 && instance.GetFillStatus(k) && taken[k]){
+            if (k != -1 && compareFunc(k) && taken[k]) {
               z.Add(k);
               n.Add(k);
               taken[k] = false;
@@ -311,14 +316,14 @@ public class MapEditorWindow : EditorWindow
 
     // Reset taken to only include horgroups
     taken.Clear();
-    foreach (var h in horgroups.Keys.ToArray()){
+    foreach (var h in horgroups.Keys.ToArray()) {
       taken.Add(h, true);
     }
 
     // Combine horizontal groups into boxes
     List<Box> zones = new List<Box>();
-    foreach(var i in taken.Keys.ToArray()){
-      if (taken[i]){
+    foreach (var i in taken.Keys.ToArray()) {
+      if (taken[i]) {
         // New box
         // i refers to position
         // group_width refers to the box length (ya that doesn't make any sense oh well)
@@ -341,7 +346,7 @@ public class MapEditorWindow : EditorWindow
               // Accept if they have the same width (and haven't been taken yet)
               var k_group = horgroups[k];
               var k_width = k_group[k_group.Count - 1] - k_group[0];
-              if (result && group_width == k_width){
+              if (result && group_width == k_width) {
                 z.AddRange(k_group);
                 n.Add(k);
                 taken[k] = false;
@@ -360,34 +365,28 @@ public class MapEditorWindow : EditorWindow
     }
 
     var size = instance.cellsize;
-    var wallLayerMask = LayerMask.NameToLayer("Wall");
+    var wallPrefab = prefab;
+    var offsetScale = wallPrefab.GetComponent<BoxCollider>().size * 0.5f;
 
-    Debug.LogFormat("Created {0} walls.", zones.Count);
+    foreach (var l in zones) {
+      var temp = Instantiate(wallPrefab);
 
-    foreach (var l in zones){
-      var temp = new GameObject("Wall",
-          new[] { typeof(MeshRenderer), typeof(MeshFilter), typeof(BoxCollider), typeof(NavMeshModifier) });
-
-      temp.transform.SetParent(mapParent);
-      temp.gameObject.layer = wallLayerMask;
-      temp.isStatic = true;
+      temp.transform.SetParent(parent);
 
       var scale = new Vector3(l.size.x * size, height, l.size.y * size);
-      var offset = Vector3.Scale(Vector3.one * 0.5f, scale);
+      var offset = Vector3.Scale(offsetScale, scale);
 
       temp.transform.position = new Vector3(l.position.x * size, 0f, l.position.y * size) + offset;
 
-      temp.GetComponent<MeshRenderer>().sharedMaterial = instance.baseWallMaterial;
-      temp.GetComponent<MeshFilter>().sharedMesh = CloneMesh(instance.baseWallMesh, scale);
+      var meshFilter = temp.GetComponent<MeshFilter>();
+      meshFilter.sharedMesh = CloneMesh(meshFilter.sharedMesh, scale);
 
       var bc = temp.GetComponent<BoxCollider>();
-      bc.size = scale;
-
-      var nm = temp.GetComponent<NavMeshModifier>();
-      nm.overrideArea = true;
-      nm.area = 1;
+      bc.size = Vector3.Scale(bc.size, scale);
 
     }
+
+    Debug.LogFormat("Created {0} {1}.", zones.Count, wallPrefab.name);
 
   }
 
@@ -400,20 +399,24 @@ public class MapEditorWindow : EditorWindow
     }
     m.vertices = vert;
 
-    var uv = CopyArray(m.uv);
-    var uv2 = CopyArray(m.uv2);
     var normals = mesh.normals;
-    for (var i = 0; i < uv.Length; i++){
-      var uvscale = NormalToUV(scale, normals[i]);
-      uv[i] = Vector2.Scale(uv[i], uvscale);
-      uv2[i] = Vector2.Scale(uv2[i], uvscale);
-    }
-    m.uv = uv;
-    m.uv2 = uv2;
+    m.uv = ScaleUV(m.uv, normals, scale);
+    m.uv2 = ScaleUV(m.uv2, normals, scale);
 
     m.RecalculateBounds();
 
     return m;
+  }
+
+  private Vector2[] ScaleUV(Vector2[] uv, Vector3[] normal, Vector3 scale){
+    var uvc = CopyArray(uv);
+
+    for(var i = 0; i < uv.Length; i++){
+      var uvscale = NormalToUV(scale, normal[i]);
+      uvc[i] = Vector2.Scale(uvc[i], uvscale);
+    }
+
+    return uvc;
   }
 
   private T[] CopyArray<T>(T[] original){

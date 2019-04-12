@@ -25,8 +25,8 @@ public class MapScriptableObject : ScriptableObject {
   public int[] filled;
   public bool display = true;
 
-  public Mesh baseWallMesh;
-  public Material baseWallMaterial;
+  public GameObject baseWallGameobject;
+  public GameObject baseCeilingGameObject;
 
   #region Get Fill Statuses
 

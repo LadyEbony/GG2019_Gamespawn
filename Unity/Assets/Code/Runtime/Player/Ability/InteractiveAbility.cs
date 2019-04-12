@@ -15,38 +15,27 @@ public class InteractiveAbility : PlayerAbility {
 
 
   [Header("Interactive Types")]
-  [TypeMask(typeof(Interactive), false)]
-  [SerializeField]
-  private string m_targets;
-  private Dictionary<Type, int> interactTargets;
-
-  static Dictionary<string, Type> _interactConversion;
-  static Dictionary<string, Type> interactConversion { 
+  private Dictionary<Type, int> _interactTargets;
+  private Dictionary<Type, int> interactTargets{
     get {
-      if (_interactConversion == null){
-        _interactConversion = new Dictionary<string, Type>();
-        foreach(var type in SubTypes.GetSubTypes(typeof(Interactive))){
-          _interactConversion.Add(type.ToString(), type);
+      if (_interactTargets == null){
+        _interactTargets = new Dictionary<Type, int>();
+        foreach (var t in INTERACT_TYPES) {
+          _interactTargets.Add(t, 1);
         }
       }
-      return _interactConversion;
+      return _interactTargets;
     }
   }
 
-  private void Awake() {
-    // Convert strings into Types
-    // If we do not include StringSplitOptions, an empty string will return an array of size 1
-    var ts = m_targets.Split(new char[] { '|' }, System.StringSplitOptions.RemoveEmptyEntries );
-
-    interactTargets = new Dictionary<Type, int>();
-    foreach(var type in interactConversion.Values){
-      interactTargets.Add(type, 1);                   // any value above 0 means no interaction
+  static Type[] __INTERACT__TYPES__;
+  static Type[] INTERACT_TYPES { 
+    get {
+      if (__INTERACT__TYPES__ == null){
+        __INTERACT__TYPES__ = SubTypes.GetSubTypes(typeof(Interactive));
+      }
+      return __INTERACT__TYPES__;
     }
-
-    foreach(var stype in ts){
-      interactTargets[interactConversion[stype]] = 0; // value of 0 means interaction
-    }
-
   }
 
   public override void UpdateSimulate(bool selected) {
@@ -96,15 +85,27 @@ public class InteractiveAbility : PlayerAbility {
     }
   }
 
-  public void DisableInteraction(Type type){
-    if (type.IsSubclassOf(typeof(Interactive))){
+  public void DisableInteraction(Type type) {
+    if (type.IsSubclassOf(typeof(Interactive))) {
       interactTargets[type] += 1;
+    }
+  }
+
+  public void DisableInteraction(params Type[] types){
+    foreach (var type in types) {
+      DisableInteraction(type);
     }
   }
 
   public void EnableInteraction(Type type) {
     if (type.IsSubclassOf(typeof(Interactive))) {
       interactTargets[type] -= 1;
+    }
+  }
+
+  public void EnableInteraction(params Type[] types) {
+    foreach (var type in types) {
+      EnableInteraction(type);
     }
   }
 
