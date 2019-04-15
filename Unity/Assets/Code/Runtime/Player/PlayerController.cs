@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using UnityEngine.AI;
+using GameSpawn;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : MonoBehaviour, IWeight, IItem {
 
   public PlayerAbility MouseOveride;
 
@@ -13,24 +14,30 @@ public class PlayerController : MonoBehaviour {
 
   private Vector3 velocity;
 
+  [Header("Inputs")]
   public int DisableInput = 0;
   public int DisableMovement = 0;
   public int DisableRotation = 0;
   public int DisableSwitch = 0;
+
+  public CylinderTriggerBounds InteractiveBounds { get; private set; }
 
   private void Awake() {
     nva = GetComponent<NavMeshAgent>();
     if (!nva) Debug.LogFormat("Missing Nav Mesh Agent component");
 
     abilities = transform.Find("Abilities").GetComponentsInChildren<PlayerAbility>();
+
+    InteractiveBounds = GetComponent<CylinderTriggerBounds>();
+    if (InteractiveBounds == null) Debug.LogErrorFormat("{0} does not contain a Bounds.", gameObject.name);
   }
 
   private void OnEnable() {
-    PlayerSwitch.instance.AddCharacter(this);
+    GlobalList<PlayerController>.Add(this);
   }
 
   private void OnDisable() {
-    PlayerSwitch.instance.RemoveCharacter(this);
+    GlobalList<PlayerController>.Remove(this);
   }
 
   private void Update() {
@@ -73,6 +80,22 @@ public class PlayerController : MonoBehaviour {
     foreach (var ab in abilities){
       ab.FixedSimulate(selected);
     }
+  }
+
+  public void Drop(PlayerController pc) {
+    throw new System.NotImplementedException();
+  }
+
+  public void Pickup(PlayerController pc) {
+    throw new System.NotImplementedException();
+  }
+
+  public void Enter(Weight weight) {
+    return;
+  }
+
+  public void Exit(Weight weight) {
+    return;
   }
 
 }

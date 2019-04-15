@@ -37,19 +37,19 @@ namespace GameSpawn {
       return sqrDistance < scaledSqrRadius;
     }
 
+    public override bool Intersect(SphereTriggerBounds bounds, out float sqrDistance) {
+      return BoundCollider.Intersect(bounds, this, out sqrDistance);
+    }
+
+    public override bool Intersect(CylinderTriggerBounds bounds, out float sqrDistance) {
+      return BoundCollider.Intersect(bounds, this, out sqrDistance);
+    }
+
     public override void OnDrawGizmosSelected() {
       Gizmos.color = Color.green;
       Gizmos.DrawWireSphere(offsetCenter, scaledRadius);
     }
 
-  }
-
-  public static partial class BoundCollider{
-    public static bool Intersect(SphereTriggerBounds a, SphereTriggerBounds b, out float sqrDistance) {
-      sqrDistance = Vector3.SqrMagnitude(a.offsetCenter - b.offsetCenter);
-      var radius = a.scaledRadius + b.scaledRadius;
-      return sqrDistance < radius * radius;
-    }
   }
 
 }

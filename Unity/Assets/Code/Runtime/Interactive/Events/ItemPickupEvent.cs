@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ItemPickupEvent : InteractiveEvent
 {
-  public override void Interact(PlayerController pc, Interactive interactive) {
+  public override void Interact(PlayerController pc, InteractiveBase interactive) {
     
   }
 }

@@ -6,12 +6,12 @@ using UnityEngine.AI;
 
 public class ItemLeverOffEvent : InteractiveEvent
 {
-  public NavMeshSurface surface;
   public GameObject wall;
 
-  public override void Interact(PlayerController pc, Interactive interactive) {
-    wall.SetActive(false);
-    surface.BuildNavMesh();
+  public override void Interact(PlayerController pc, InteractiveBase interactive) {
+    wall.SetActive(true);
+    foreach (var surface in NavMeshSurface.activeSurfaces)
+      surface.BuildNavMesh();
   }
 
 }

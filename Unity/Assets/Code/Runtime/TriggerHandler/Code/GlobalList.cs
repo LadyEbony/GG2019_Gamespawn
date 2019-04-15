@@ -35,6 +35,12 @@ namespace GameSpawn {
       }
     }
 
+    public static List<T> GetListUnsafe{
+      get {
+        return list;
+      }
+    }
+
     public static void Add(T item){
       list.Add(item);
     }

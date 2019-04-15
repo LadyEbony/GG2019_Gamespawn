@@ -33,6 +33,7 @@ public class MapEditorWindow : EditorWindow
   // Remembering pre-show-map state
   private bool onView;
   private bool previousOrtho;
+  private MapScriptableObject.CellType selectedCellType = MapScriptableObject.CellType.Wall;
 
   /// <summary>
   /// Editor Window
@@ -51,9 +52,9 @@ public class MapEditorWindow : EditorWindow
       width_scr = instance.width;
     }
 
-    var filledLength = instance.length * instance.width / 32;
-    if (instance.filled.Length < filledLength) {
-      instance.filled = new int[filledLength];
+    var filledLength = instance.length * instance.width / MapScriptableObject.CELLS_PER_INT;
+    if (instance.cells.Length < filledLength) {
+      instance.cells = new int[filledLength];
     }
 
     EditorGUILayout.LabelField(SceneManager.GetActiveScene().name);
@@ -83,6 +84,21 @@ public class MapEditorWindow : EditorWindow
     instance.baseWallGameobject = (GameObject)EditorGUILayout.ObjectField("Wall Prefab", instance.baseWallGameobject, typeof(GameObject), false);
     instance.baseCeilingGameObject = (GameObject)EditorGUILayout.ObjectField("Ceiling Prefab", instance.baseCeilingGameObject, typeof(GameObject), false);
 
+    EditorGUILayout.Separator();
+
+    // Paint buttons
+    EditorGUILayout.BeginHorizontal();
+    
+    foreach(MapScriptableObject.CellType cellvalue in System.Enum.GetValues(typeof(MapScriptableObject.CellType))){
+      var content = string.Format(selectedCellType == cellvalue ? "[{0}]" : "{0}", cellvalue.ToString());
+      if (GUILayout.Button(content)){
+        selectedCellType = cellvalue;
+      }
+    }
+
+    EditorGUILayout.EndHorizontal();
+
+    // Show/Hide maps. Create Map
     EditorGUILayout.Separator();
     if (GUILayout.Button(instance.display ? "Hide Map" : "Show Map")) {
       instance.display = !instance.display;
@@ -156,14 +172,14 @@ public class MapEditorWindow : EditorWindow
 
     // Main draw
     for(var i = 0; i < instance.GetSize(); i++){
-      faceColor = instance.GetFillStatus(i) ? Color.red : Color.clear;
+      faceColor = instance.GetCellColor(instance.GetCellValue(i));
       DrawSolidRectangle(instance.GetMapPosition(i), left, bot, cell, faceColor);
     }
 
     // Box draw
     if (dragActiveBox) {
-      foreach (var m in instance.GetRegionList(dragStartIndex, dragEndIndex)) {
-        faceColor = dragSetState == 0 ? Color.white : Color.red;
+      foreach (var m in instance.GetRegion(dragStartIndex, dragEndIndex)) {
+        faceColor = instance.GetCellDragColor(dragSetState);
         DrawSolidRectangle(m, left, bot, cell, faceColor);
       }
     }
@@ -214,7 +230,7 @@ public class MapEditorWindow : EditorWindow
           // Click
           if (e.type == EventType.MouseDown) {
             dragActiveBox = true;
-            dragSetState = instance.GetFillStatus(instance.GetIndex(x, z)) ? 0 : 1;
+            dragSetState = instance.GetCellType(instance.GetIndex(x, z), (int)selectedCellType) ? 0 : (int)selectedCellType;
             dragStartIndex = new MapVector(x, z);
             dragEndIndex = new MapVector(x, z);
           }
@@ -231,8 +247,8 @@ public class MapEditorWindow : EditorWindow
       else if (e.type == EventType.MouseUp) {
         if (dragActiveBox) {
           // Set all blocks
-          foreach (var k in instance.GetRegionList(dragStartIndex, dragEndIndex)) {
-            instance.SetFillStatus(instance.GetIndex(k.x, k.z), dragSetState);
+          foreach (var k in instance.GetRegion(dragStartIndex, dragEndIndex)) {
+            instance.SetCellType(instance.GetIndex(k.x, k.z), dragSetState);
           }
           e.Use();
         }
@@ -265,8 +281,8 @@ public class MapEditorWindow : EditorWindow
     if (mapParent) map.transform.SetParent(mapParent);
     mapParent = map.transform;
 
-    CreateMap(instance.baseWallGameobject, mapParent, instance.height, (i) => instance.GetFillStatus(i));
-    CreateMap(instance.baseCeilingGameObject, mapParent, 1, (i) => !instance.GetFillStatus(i));
+    CreateMap(instance.baseWallGameobject, mapParent, instance.height, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Wall));
+    CreateMap(instance.baseCeilingGameObject, mapParent, 1, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Ground));
   }
 
   private void CreateMap(GameObject prefab, Transform parent, float heightScale, System.Func<int, bool> compareFunc){

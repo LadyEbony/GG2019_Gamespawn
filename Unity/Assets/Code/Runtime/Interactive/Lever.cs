@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Lever : Interactive
+public class Lever : WallInteractive
 {
-  public Material Material { get; private set; }
   [SerializeField] private bool status;
 
   private InteractiveEvent onevent;
@@ -13,11 +12,9 @@ public class Lever : Interactive
   public override void Awake() {
     base.Awake();
 
-    Material = GetComponent<MeshRenderer>().material;
-
     var events = GetComponents<InteractiveEvent>();
     if (events.Length >= 1) onevent = events[0];
-    if (events.Length >= 1) offevent = events[1];
+    if (events.Length >= 2) offevent = events[1];
   }
 
   public override void Interact(PlayerController pc) {

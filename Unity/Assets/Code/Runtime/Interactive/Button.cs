@@ -2,16 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Button : Interactive {
-
-  public Material Material { get; private set; }
+public class Button : WallInteractive {
 
   private InteractiveEvent bevent;
 
   public override void Awake() {
     base.Awake();
-
-    Material = GetComponent<MeshRenderer>().material;
 
     bevent = GetComponent<InteractiveEvent>();
   }

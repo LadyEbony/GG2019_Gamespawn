@@ -17,12 +17,26 @@ public struct MapVector {
 }
 
 public class MapScriptableObject : ScriptableObject {
+
+  public string version = "1.0";
+  public const string CURRENT_VERSION = "1.1";
+  public bool IsUpdated { get { return version == CURRENT_VERSION; } }
+
   public int length = 8;
   public int width = 8;
   public int height = 2;
   public float cellsize = 1;
 
-  public int[] filled;
+  public enum CellType { Ground, Wall, Pitfall }
+
+  public const int CELLS_PER_INT = 8;
+  public const int CELL_TYPE_BASE = 15;
+  public const int SHIFT_MULTI = 4;
+
+  public int GetCellIndex(int index) { return index / CELLS_PER_INT; }
+  public int GetCellShift(int index) { return (index % CELLS_PER_INT) * SHIFT_MULTI; }
+
+  public int[] cells;
   public bool display = true;
 
   public GameObject baseWallGameobject;
@@ -30,30 +44,50 @@ public class MapScriptableObject : ScriptableObject {
 
   #region Get Fill Statuses
 
-  public bool GetFillStatus(int index) {
-    return (filled[index / 32] & (1 << (index % 32))) != 0;
+  public bool GetCellType(int index, int cellType) {
+    return GetCellValue(index) == cellType;
   }
 
-  public void ToggleFillStatus(int index) {
-    filled[index / 32] = filled[index / 32] ^ (1 << (index % 32));
+  public int GetCellValue(int index){
+    var cellindex = GetCellIndex(index);
+    var shift = GetCellShift(index);
+    return (cells[cellindex] & (CELL_TYPE_BASE << shift)) >> shift;
   }
 
-  public void SetFillStatus(int index, int state) {
-    filled[index / 32] = (filled[index / 32] & ~(1 << (index % 32))) | (state << (index % 32));
+  public void ClearCell(int index) {
+    var cellindex = GetCellIndex(index);
+    var shift = GetCellShift(index);
+    cells[cellindex] = cells[cellindex] & ~(CELL_TYPE_BASE << shift);
   }
 
-  public List<MapVector> GetRegionList() {
-    var list = new List<MapVector>();
+  public void SetCellType(int index, int cellType) {
+    SetCellType(index, cellType, ref cells);
+  }
 
-    for (var i = 0; i <= length * width; i++) {
-      if (GetFillStatus(i))
-        list.Add(GetMapPosition(i));
+  public void SetCellType(int index, int cellType, ref int[] filled) {
+    var cellindex = GetCellIndex(index);
+    var shift = GetCellShift(index);
+    filled[cellindex] = (filled[cellindex] & ~(CELL_TYPE_BASE << shift)) | (cellType << shift);
+  }
+
+  public Dictionary<CellType, List<MapVector>> GetMap() {
+    var dict = new Dictionary<CellType, List<MapVector>>();
+
+    foreach(int type in System.Enum.GetValues(typeof(CellType))){
+      dict.Add((CellType)type, new List<MapVector>());
     }
 
-    return list;
+    int cellvalue;
+
+    for (var i = 0; i <= length * width; i++) {
+      cellvalue = GetCellValue(i);
+      dict[(CellType)cellvalue].Add(GetMapPosition(i));
+    }
+
+    return dict;
   }
 
-  public List<MapVector> GetRegionList(MapVector start, MapVector end) {
+  public List<MapVector> GetRegion(MapVector start, MapVector end) {
     var list = new List<MapVector>();
 
     MapVector s = new MapVector(MathfExtender.MinInt(start.x, end.x), MathfExtender.MinInt(start.z, end.z));
@@ -160,7 +194,7 @@ public class MapScriptableObject : ScriptableObject {
     var x_offset = (this.length - length) / 2;
     var y_offset = (this.width - width) / 2;
 
-    int[] filled = new int[Mathf.CeilToInt(n_size / 32f)];
+    int[] filled = new int[Mathf.CeilToInt(n_size / (float)CELLS_PER_INT)];
 
     int xi, yi, i;
 
@@ -169,17 +203,36 @@ public class MapScriptableObject : ScriptableObject {
         xi = x + x_offset;
         yi = y + y_offset;
         if (xi >= 0 && xi < this.length && yi >= 0 && yi < this.width){
-          if (GetFillStatus(GetIndex(xi, yi))) {
-            i = GetIndex(x, y, length);
-            filled[i / 32] |= 1 << (i % 32);
-          }
+          var cellValue = GetCellValue(GetIndex(xi, yi));
+          SetCellType(GetIndex(x, y, length), cellValue, ref filled);
         }
       }
     }
 
-    this.filled = filled;
+    this.cells = filled;
     this.length = length;
     this.width = width;
+  }
+
+  #endregion
+
+  #region Colors
+
+  public Color GetCellColor(int cellvalue){
+    switch(cellvalue){
+      case (int)CellType.Ground:
+        return Color.clear;
+      case (int)CellType.Wall:
+        return Color.red;
+      case (int)CellType.Pitfall:
+        return Color.blue;
+    }
+    return Color.white;
+  }
+
+  public Color GetCellDragColor(int cellvalue) {
+    if (cellvalue == 0) return Color.white;
+    return GetCellColor(cellvalue);
   }
 
   #endregion

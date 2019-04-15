@@ -4,26 +4,21 @@ using UnityEngine;
 
 using GameSpawn;
 
-public class Item :  Interactive {
+public class Item : Interactive, IItem, IWeight {
   
   public Rigidbody Rigidbody { get; private set; }
-  public Material Material { get; private set; }
 
   private InteractiveEvent pickupEvent;
   private InteractiveEvent dropEvent;
 
   public override void Awake() {
     base.Awake();
+
     Rigidbody = GetComponent<Rigidbody>();
-    Material = GetComponent<MeshRenderer>().material;
 
     var events = GetComponents<InteractiveEvent>();
     if (events.Length >= 1) pickupEvent = events[0];
     if (events.Length >= 2) dropEvent = events[1];
-  }
-
-  public override void Interact(PlayerController pc) {
-    
   }
 
   public void Pickup(PlayerController pc){
@@ -54,4 +49,11 @@ public class Item :  Interactive {
     Material.SetColor("_Color", Color.white);
   }
 
+  public void Enter(Weight weight) {
+    return;
+  }
+
+  public void Exit(Weight weight) {
+    return;
+  }
 }

@@ -6,7 +6,7 @@ public class ItemButtonEvent : InteractiveEvent
 {
   public GameObject Item;
 
-  public override void Interact(PlayerController pc, Interactive interactive) {
+  public override void Interact(PlayerController pc, InteractiveBase interactive) {
     Instantiate(Item, Random.insideUnitSphere * 5 + new Vector3(0, 5, 0), Quaternion.identity);
   }
 

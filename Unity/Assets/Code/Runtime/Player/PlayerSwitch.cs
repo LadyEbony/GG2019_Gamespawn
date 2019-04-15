@@ -1,13 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+
 using UnityEngine;
+using GameSpawn;
 
 public class PlayerSwitch : MonoBehaviour
 {
   public static PlayerSwitch instance { get; private set; }
 
   public PlayerController Selected { get; private set; }
-  private List<PlayerController> characters;
+  public List<PlayerController> characters { get { return GlobalList<PlayerController>.GetListUnsafe; } }
 
   private void Awake() {
     if (instance){
@@ -18,7 +21,7 @@ public class PlayerSwitch : MonoBehaviour
   }
 
   private void Start() {
-    if (characters == null) characters = new List<PlayerController>();
+    var characters = this.characters;
 
     if (characters.Count == 0){
       Debug.Log("No player controllers in scene");
@@ -29,15 +32,17 @@ public class PlayerSwitch : MonoBehaviour
 
   private void FixedUpdate() {
     var player = PlayerInput.instance;
+    var characters = this.characters;
+    var characterCount = characters.Count;
 
     if (player.DisableInput == 0 && player.DisableSwitch == 0){
-      if (player.oneInput.IsDown() && characters.Count >= 1){
+      if (player.oneInput.IsDown() && characterCount >= 1){
         Selected = characters[0];
-      } else if (player.twoInput.IsDown() && characters.Count >= 2) {
+      } else if (player.twoInput.IsDown() && characterCount >= 2) {
         Selected = characters[1];
-      } else if (player.threeInput.IsDown() && characters.Count >= 3) {
+      } else if (player.threeInput.IsDown() && characterCount >= 3) {
         Selected = characters[2];
-      } else if (player.tabInput.IsDown() && characters.Count >= 2) {
+      } else if (player.tabInput.IsDown() && characterCount >= 2) {
         var index = characters.IndexOf(Selected);
         if (index == -1) {
           Selected = characters[0];
@@ -49,16 +54,5 @@ public class PlayerSwitch : MonoBehaviour
     }
 
   }
-
-  public void AddCharacter(PlayerController pc) {
-    if (characters == null) characters = new List<PlayerController>();
-    if (!characters.Contains(pc)) characters.Add(pc);
-  }
-
-  public void RemoveCharacter(PlayerController pc) {
-    if (characters == null) characters = new List<PlayerController>();
-    characters.Remove(pc);
-  }
-
 
 }

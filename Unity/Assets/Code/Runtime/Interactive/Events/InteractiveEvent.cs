@@ -4,5 +4,5 @@ using UnityEngine;
 
 public abstract class InteractiveEvent : MonoBehaviour
 {
-  public abstract void Interact(PlayerController pc, Interactive interactive);
+  public abstract void Interact(PlayerController pc, InteractiveBase interactive);
 }

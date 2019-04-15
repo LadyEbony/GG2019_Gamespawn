@@ -49,6 +49,10 @@ namespace GameSpawn {
       throw new System.NotImplementedException();
     }
 
+    public override bool Intersect(CylinderTriggerBounds bounds, out float sqrDistance) {
+      return BoundCollider.Intersect(bounds, this, out sqrDistance);
+    }
+
     public override void OnDrawGizmosSelected() {
       Gizmos.color = Color.green;
       var bot = offsetBottom;
@@ -66,23 +70,6 @@ namespace GameSpawn {
       Gizmos.DrawLine(bot - zRad, top - zRad);
     }
 
-  }
-
-  public static partial class BoundCollider{
-    public static bool Intersect(CylinderTriggerBounds a, SphereTriggerBounds b, out float sqrDistance) {
-      var cylOffset = a.offsetCenter;
-      var cylHeight = a.scaledHeight;
-      var cylRadius = a.scaledRadius;
-      var sphOffset = b.offsetCenter;
-      var sphRadius = b.scaledRadius;
-
-      sqrDistance = Vector3Extender.SqrMagnitudeXZ(cylOffset - sphOffset);  // XZ check
-      var heightDistance = sphOffset.y - cylOffset.y;                       // Y check
-
-      var radius = cylRadius + sphRadius;
-      var height = cylHeight + sphRadius;
-      return (sqrDistance < radius * radius) && (heightDistance < height);
-    }
   }
 
 }
