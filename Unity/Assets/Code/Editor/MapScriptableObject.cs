@@ -27,7 +27,7 @@ public class MapScriptableObject : ScriptableObject {
   public int height = 2;
   public float cellsize = 1;
 
-  public enum CellType { Ground, Wall, Pitfall }
+  public enum CellType { Ground, Wall, Pitfall, WallFloor, WallPitfall }
 
   public const int CELLS_PER_INT = 8;
   public const int CELL_TYPE_BASE = 15;
@@ -226,6 +226,10 @@ public class MapScriptableObject : ScriptableObject {
         return Color.red;
       case (int)CellType.Pitfall:
         return Color.blue;
+      case (int)CellType.WallFloor:
+        return Color.magenta;
+      case (int)CellType.WallPitfall:
+        return Color.cyan;
     }
     return Color.white;
   }

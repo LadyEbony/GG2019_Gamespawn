@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
-using UnityEditor;
 using UnityEngine.SceneManagement;
 
-using UnityEngine.AI;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+
+using System.IO;
 
 public class MapEditorWindow : EditorWindow
 {
@@ -18,10 +19,12 @@ public class MapEditorWindow : EditorWindow
 
   private void OnEnable() {
     SceneView.onSceneGUIDelegate += this.OnSceneGUI;
+    EditorSceneManager.activeSceneChangedInEditMode += this.OnSceneChanged;
   }
 
   private void OnDisable() {
     SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
+    EditorSceneManager.activeSceneChangedInEditMode -= this.OnSceneChanged;
   }
 
   // Main variable
@@ -41,23 +44,10 @@ public class MapEditorWindow : EditorWindow
   private void OnGUI() {
     if (instance == null){
       var currentScene = SceneManager.GetActiveScene();
-      var scenepath = currentScene.path;
-      var path = string.Format("{0}/{1}.asset", scenepath.Substring(0, scenepath.LastIndexOf('.')), "Map");
-      instance = AssetDatabase.LoadAssetAtPath<MapScriptableObject>(path);
-      if (instance == null){
-        instance = CreateInstance<MapScriptableObject>();
-        AssetDatabase.CreateAsset(instance, string.Format("{0}", path));
-      }
-      length_scr = instance.length;
-      width_scr = instance.width;
+      GetMapInstance(currentScene);
     }
 
-    var filledLength = instance.length * instance.width / MapScriptableObject.CELLS_PER_INT;
-    if (instance.cells.Length < filledLength) {
-      instance.cells = new int[filledLength];
-    }
-
-    EditorGUILayout.LabelField(SceneManager.GetActiveScene().name);
+    EditorGUILayout.LabelField(instance.name);
     EditorGUILayout.Separator();
 
     length_scr = EditorGUILayout.IntField("Length", length_scr);
@@ -88,11 +78,16 @@ public class MapEditorWindow : EditorWindow
 
     // Paint buttons
     EditorGUILayout.BeginHorizontal();
-    
+    var i = 0;
     foreach(MapScriptableObject.CellType cellvalue in System.Enum.GetValues(typeof(MapScriptableObject.CellType))){
       var content = string.Format(selectedCellType == cellvalue ? "[{0}]" : "{0}", cellvalue.ToString());
       if (GUILayout.Button(content)){
         selectedCellType = cellvalue;
+      }
+      if (++i == 4){
+        i = 0;
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.BeginHorizontal();
       }
     }
 
@@ -112,6 +107,30 @@ public class MapEditorWindow : EditorWindow
     EditorUtility.SetDirty(instance);
 
 
+  }
+
+  private void OnSceneChanged(Scene current, Scene next){
+    GetMapInstance(next);
+  }
+
+  private void GetMapInstance(Scene scene){
+    var scenepath = scene.path;
+    var directorypath = scenepath.Substring(0, scenepath.LastIndexOf('.'));
+    var assetpath = string.Format("{0}/{1}_{2}.asset", directorypath, scene.name, "Map");
+    instance = AssetDatabase.LoadAssetAtPath<MapScriptableObject>(assetpath);
+    if (instance == null) {
+      instance = CreateInstance<MapScriptableObject>();
+      instance.cells = new int[instance.length * instance.width / MapScriptableObject.CELLS_PER_INT];
+
+      if (!Directory.Exists(directorypath)) {
+        Directory.CreateDirectory(directorypath);
+      }
+
+      AssetDatabase.CreateAsset(instance, string.Format("{0}", assetpath));
+    }
+
+    length_scr = instance.length;
+    width_scr = instance.width;
   }
 
   // Drag variables
@@ -282,7 +301,9 @@ public class MapEditorWindow : EditorWindow
     mapParent = map.transform;
 
     CreateMap(instance.baseWallGameobject, mapParent, instance.height, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Wall));
-    CreateMap(instance.baseCeilingGameObject, mapParent, 1, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Ground));
+    CreateMap(instance.baseCeilingGameObject, mapParent, 1, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Ground) || instance.GetCellType(i, (int)MapScriptableObject.CellType.WallFloor));
+    CreateMap(instance.baseWallGameobject, mapParent, instance.height, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.WallFloor));
+    CreateMap(instance.baseWallGameobject, mapParent, instance.height, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.WallPitfall));
   }
 
   private void CreateMap(GameObject prefab, Transform parent, float heightScale, System.Func<int, bool> compareFunc){
