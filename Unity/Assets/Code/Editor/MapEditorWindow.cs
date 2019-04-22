@@ -69,8 +69,9 @@ public class MapEditorWindow : EditorWindow
     EditorGUILayout.Separator();
 
     instance.cellsize = EditorGUILayout.FloatField("Cell Size", instance.cellsize);
-
+    
     EditorGUILayout.Separator();
+    instance.baseGroundGameobject = (GameObject)EditorGUILayout.ObjectField("Ground Prefab", instance.baseGroundGameobject, typeof(GameObject), false);
     instance.baseWallGameobject = (GameObject)EditorGUILayout.ObjectField("Wall Prefab", instance.baseWallGameobject, typeof(GameObject), false);
     instance.baseCeilingGameObject = (GameObject)EditorGUILayout.ObjectField("Ceiling Prefab", instance.baseCeilingGameObject, typeof(GameObject), false);
 
@@ -300,13 +301,16 @@ public class MapEditorWindow : EditorWindow
     if (mapParent) map.transform.SetParent(mapParent);
     mapParent = map.transform;
 
-    CreateMap(instance.baseWallGameobject, mapParent, instance.height, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Wall));
-    CreateMap(instance.baseCeilingGameObject, mapParent, 1, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Ground) || instance.GetCellType(i, (int)MapScriptableObject.CellType.WallFloor));
-    CreateMap(instance.baseWallGameobject, mapParent, instance.height, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.WallFloor));
-    CreateMap(instance.baseWallGameobject, mapParent, instance.height, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.WallPitfall));
+    var size = instance.cellsize;
+    var height = instance.height;
+    CreateMap(instance.baseWallGameobject,    mapParent, new Vector3(size, height, size), Vector3.one * 0.5f,               (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Wall));
+    CreateMap(instance.baseCeilingGameObject, mapParent, new Vector3(size, 1f, size),     new Vector3(0.5f, height, 0.5f),  (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Wall));
+    CreateMap(instance.baseGroundGameobject,  mapParent, new Vector3(size, 1f, size),     new Vector3(0.5f, 0.0f, 0.5f),    (i) => { var temp = instance.GetCellValue(i); return temp == (int)MapScriptableObject.CellType.Ground || temp == (int)MapScriptableObject.CellType.WallFloor; });
+    //CreateMap(instance.baseWallGameobject, mapParent, instance.height, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.WallFloor));
+    //CreateMap(instance.baseWallGameobject, mapParent, instance.height, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.WallPitfall));
   }
 
-  private void CreateMap(GameObject prefab, Transform parent, float heightScale, System.Func<int, bool> compareFunc){
+  private void CreateMap(GameObject prefab, Transform parent, Vector3 sizeScale, Vector3 offsetScale, System.Func<int, bool> compareFunc){
     // Iterach each zone
     // Make horizontal groups
     // Then make vertical groups
@@ -316,7 +320,6 @@ public class MapEditorWindow : EditorWindow
     Dictionary<int, bool> taken = new Dictionary<int, bool>();
     var length = instance.length;
     var width = instance.width;
-    var height = heightScale;
 
     for (var i = 0; i < length * width; i++) {
       if (compareFunc(i)) taken.Add(i, true);
@@ -401,79 +404,35 @@ public class MapEditorWindow : EditorWindow
       }
     }
 
+    // Create all gameobjects
     var size = instance.cellsize;
     var wallPrefab = prefab;
-    var offsetScale = wallPrefab.GetComponent<BoxCollider>().size * 0.5f;
+
+    var sharedMesh = Instantiate(wallPrefab.GetComponent<MeshFilter>().sharedMesh);
 
     foreach (var l in zones) {
       var temp = Instantiate(wallPrefab);
 
       temp.transform.SetParent(parent);
 
-      var scale = new Vector3(l.size.x * size, height, l.size.y * size);
+      var scale = Vector3.Scale(sizeScale, new Vector3(l.size.x, 1f, l.size.y));
       var offset = Vector3.Scale(offsetScale, scale);
-
-      temp.transform.position = new Vector3(l.position.x * size, 0f, l.position.y * size) + offset;
-
-      var meshFilter = temp.GetComponent<MeshFilter>();
-      meshFilter.sharedMesh = CloneMesh(meshFilter.sharedMesh, scale);
 
       var bc = temp.GetComponent<BoxCollider>();
       bc.size = Vector3.Scale(bc.size, scale);
+
+      temp.transform.position = Vector3.Scale(sizeScale, new Vector3(l.position.x, 0f, l.position.y)) + offset;
+
+      var scaledMesh = Instantiate(sharedMesh);
+      MeshExtender.ScaleMesh(scaledMesh, scale);
+      temp.GetComponent<MeshFilter>().sharedMesh = scaledMesh;
+
 
     }
 
     Debug.LogFormat("Created {0} {1}.", zones.Count, wallPrefab.name);
 
   }
-
-  private Mesh CloneMesh(Mesh mesh, Vector3 scale){
-    var m = Instantiate<Mesh>(mesh);
-
-    var vert = CopyArray(m.vertices);
-    for (var i = 0; i < vert.Length; i++) {
-      vert[i] = Vector3.Scale(vert[i], scale);
-    }
-    m.vertices = vert;
-
-    var normals = mesh.normals;
-    m.uv = ScaleUV(m.uv, normals, scale);
-    m.uv2 = ScaleUV(m.uv2, normals, scale);
-
-    m.RecalculateBounds();
-
-    return m;
-  }
-
-  private Vector2[] ScaleUV(Vector2[] uv, Vector3[] normal, Vector3 scale){
-    var uvc = CopyArray(uv);
-
-    for(var i = 0; i < uv.Length; i++){
-      var uvscale = NormalToUV(scale, normal[i]);
-      uvc[i] = Vector2.Scale(uvc[i], uvscale);
-    }
-
-    return uvc;
-  }
-
-  private T[] CopyArray<T>(T[] original){
-    var length = original.Length;
-    T[] copy = new T[length];
-    System.Array.Copy(original, copy, length);
-    return copy;
-  }
-
-  private Vector2 NormalToUV(Vector3 vector, Vector3 normal){
-    if (normal.Equals(Vector3.forward) || normal.Equals(Vector3.back)) {
-      return new Vector2(vector.x, vector.y);
-    } else if (normal.Equals(Vector3.up) || normal.Equals(Vector3.down)) {
-      return new Vector2(vector.x, vector.z);
-    } else if (normal.Equals(Vector3.left) || normal.Equals(Vector3.right)) {
-      return new Vector2(vector.z, vector.y);
-    }
-    return Vector3.zero;
-  }
-
 
   #endregion
 }

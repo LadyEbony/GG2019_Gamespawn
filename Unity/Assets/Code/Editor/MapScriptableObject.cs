@@ -39,6 +39,7 @@ public class MapScriptableObject : ScriptableObject {
   public int[] cells;
   public bool display = true;
 
+  public GameObject baseGroundGameobject;
   public GameObject baseWallGameobject;
   public GameObject baseCeilingGameObject;
 
