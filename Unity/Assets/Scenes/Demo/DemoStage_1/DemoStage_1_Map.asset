@@ -23,5 +23,3 @@ MonoBehaviour:
     type: 3}
   baseWallGameobject: {fileID: 5548279939260946018, guid: ca7078cd0ab007644a89408083e2cbf8,
     type: 3}
-  baseCeilingGameObject: {fileID: 2544914064428682688, guid: 8cc67f168387bbd428bbae02d1c6ce8d,
-    type: 3}

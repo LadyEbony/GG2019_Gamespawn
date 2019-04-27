@@ -41,7 +41,6 @@ public class MapScriptableObject : ScriptableObject {
 
   public GameObject baseGroundGameobject;
   public GameObject baseWallGameobject;
-  public GameObject baseCeilingGameObject;
 
   #region Get Fill Statuses
 

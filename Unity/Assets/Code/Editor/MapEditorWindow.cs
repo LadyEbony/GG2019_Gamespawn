@@ -73,7 +73,6 @@ public class MapEditorWindow : EditorWindow
     EditorGUILayout.Separator();
     instance.baseGroundGameobject = (GameObject)EditorGUILayout.ObjectField("Ground Prefab", instance.baseGroundGameobject, typeof(GameObject), false);
     instance.baseWallGameobject = (GameObject)EditorGUILayout.ObjectField("Wall Prefab", instance.baseWallGameobject, typeof(GameObject), false);
-    instance.baseCeilingGameObject = (GameObject)EditorGUILayout.ObjectField("Ceiling Prefab", instance.baseCeilingGameObject, typeof(GameObject), false);
 
     EditorGUILayout.Separator();
 
@@ -304,7 +303,6 @@ public class MapEditorWindow : EditorWindow
     var size = instance.cellsize;
     var height = instance.height;
     CreateMap(instance.baseWallGameobject,    mapParent, new Vector3(size, height, size), Vector3.one * 0.5f,               (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Wall));
-    CreateMap(instance.baseCeilingGameObject, mapParent, new Vector3(size, 1f, size),     new Vector3(0.5f, height, 0.5f),  (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Wall));
     CreateMap(instance.baseGroundGameobject,  mapParent, new Vector3(size, 1f, size),     new Vector3(0.5f, 0.0f, 0.5f),    (i) => { var temp = instance.GetCellValue(i); return temp == (int)MapScriptableObject.CellType.Ground || temp == (int)MapScriptableObject.CellType.WallFloor; });
     //CreateMap(instance.baseWallGameobject, mapParent, instance.height, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.WallFloor));
     //CreateMap(instance.baseWallGameobject, mapParent, instance.height, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.WallPitfall));
