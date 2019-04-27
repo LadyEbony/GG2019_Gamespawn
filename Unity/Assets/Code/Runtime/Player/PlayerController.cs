@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour, IWeight, IItem {
 
   public PlayerAbility MouseOveride;
 
-  private NavMeshAgent nva;
+  public NavMeshAgent nva { get; private set; }
   private PlayerAbility[] abilities;
 
   private Vector3 velocity;
@@ -19,6 +19,16 @@ public class PlayerController : MonoBehaviour, IWeight, IItem {
   public int DisableMovement = 0;
   public int DisableRotation = 0;
   public int DisableSwitch = 0;
+
+  [SerializeField] private int disableNavMesh = 0;
+  public int DisableNavMesh{
+    get {
+      return disableNavMesh;
+    } set {
+      disableNavMesh = value;
+      nva.enabled = disableNavMesh == 0;
+    }
+  }
 
   public CylinderTriggerBounds InteractiveBounds { get; private set; }
 
@@ -43,29 +53,31 @@ public class PlayerController : MonoBehaviour, IWeight, IItem {
   private void Update() {
     var selected = PlayerSwitch.instance.Selected == this;
 
-    // Get input
-    Vector3 input;
-    if (selected){
-      input = PlayerInput.instance.GetDirectionInput;
-    } else {
-      input = Vector3.zero;
-    }
+    if (DisableNavMesh == 0) {
+      // Get input
+      Vector3 input;
+      if (selected) {
+        input = PlayerInput.instance.GetDirectionInput;
+      } else {
+        input = Vector3.zero;
+      }
 
-    // Acceleration and Movement
-    var movementInput = DisableMovement == 0 ? input : Vector3.zero;
-    velocity = Vector3.MoveTowards(velocity,
-      movementInput * nva.speed,
-      Time.deltaTime * nva.acceleration
-    );
-
-    nva.Move(velocity * Time.deltaTime);
-
-    var directionalInput = DisableRotation == 0 ? input : Vector3.zero;
-
-    if (directionalInput != Vector3.zero){
-      transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(directionalInput, Vector3.up),
-        nva.angularSpeed * Time.deltaTime
+      // Acceleration and Movement
+      var movementInput = DisableMovement == 0 ? input : Vector3.zero;
+      velocity = Vector3.MoveTowards(velocity,
+        movementInput * nva.speed,
+        Time.deltaTime * nva.acceleration
       );
+
+      nva.Move(velocity * Time.deltaTime);
+
+      var directionalInput = DisableRotation == 0 ? input : Vector3.zero;
+
+      if (directionalInput != Vector3.zero) {
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(directionalInput, Vector3.up),
+          nva.angularSpeed * Time.deltaTime
+        );
+      }
     }
 
     foreach (var ab in abilities) {
