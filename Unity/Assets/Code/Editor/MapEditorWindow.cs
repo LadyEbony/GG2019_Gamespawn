@@ -32,6 +32,16 @@ public class MapEditorWindow : EditorWindow
 
   // Safety check for size conversion
   private int length_scr, width_scr;
+  private Vector2 anchor = new Vector2(0.5f, 0.5f);
+
+  private static readonly Vector2[] anchorSet = new Vector2[] { 
+    new Vector2(0.0f, 1.0f), new Vector2(0.5f, 1.0f), new Vector2(1.0f, 1.0f), 
+    new Vector2(0.0f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(1.0f, 0.5f), 
+    new Vector2(0.0f, 0.0f), new Vector2(0.5f, 0.0f), new Vector2(1.0f, 0.0f)
+  };
+  private static readonly string[] anchorText = new string[] {
+    "TL", "TC", "TR", "ML", "MC", "MR", "BL", "BM", "BR"
+  };
 
   // Remembering pre-show-map state
   private bool onView;
@@ -47,6 +57,10 @@ public class MapEditorWindow : EditorWindow
       GetMapInstance(currentScene);
     }
 
+    GUIStyle standardButton = new GUIStyle(GUI.skin.button);
+    GUIStyle pressedButton = new GUIStyle(GUI.skin.button);
+    pressedButton.normal = pressedButton.active;
+
     EditorGUILayout.LabelField(instance.name);
     EditorGUILayout.Separator();
 
@@ -56,8 +70,21 @@ public class MapEditorWindow : EditorWindow
 
     if ((instance.length != length_scr && length_scr > 0) || (instance.width != width_scr && width_scr > 0)){
       EditorGUILayout.BeginHorizontal();
+      //CreateAnchorTextures();
+      for(var a = 0; a < anchorSet.Length; a++){
+        if (GUILayout.Button(anchorText[a], anchor == anchorSet[a] ? pressedButton : standardButton)){
+          anchor = anchorSet[a];
+        }
+        if ((a + 1) % 3 == 0){
+          EditorGUILayout.EndHorizontal();
+          EditorGUILayout.BeginHorizontal();
+        }
+      }
+      EditorGUILayout.EndHorizontal();
+
+      EditorGUILayout.BeginHorizontal();
       if(GUILayout.Button("Apply")){
-        instance.Resize(length_scr, width_scr);
+        instance.Resize(length_scr, width_scr, anchor);
       }
 
       if (GUILayout.Button("Reset")) {
@@ -80,8 +107,7 @@ public class MapEditorWindow : EditorWindow
     EditorGUILayout.BeginHorizontal();
     var i = 0;
     foreach(MapScriptableObject.CellType cellvalue in System.Enum.GetValues(typeof(MapScriptableObject.CellType))){
-      var content = string.Format(selectedCellType == cellvalue ? "[{0}]" : "{0}", cellvalue.ToString());
-      if (GUILayout.Button(content)){
+      if (GUILayout.Button(cellvalue.ToString(), selectedCellType == cellvalue ? pressedButton : standardButton)){
         selectedCellType = cellvalue;
       }
       if (++i == 4){
@@ -132,7 +158,34 @@ public class MapEditorWindow : EditorWindow
     length_scr = instance.length;
     width_scr = instance.width;
   }
+  /*
+  private void CreateAnchorTextures() {
+    if (anchorTextures == null || anchorTextures.Length < anchorSet.Length){
+      Texture2D tex;
 
+      anchorTextures = new Texture2D[anchorSet.Length];
+      for(var i = 0; i < anchorSet.Length; i++){
+        tex = new Texture2D(7, 7);
+        for(var y = 0; y < tex.height; y++) {
+          for(var x = 0; x < tex.width; x++){
+            tex.SetPixel(x, y, Color.clear);
+          }
+        }
+
+        foreach(var ianch in anchorSet){
+          tex.SetPixel(Mathf.RoundToInt(ianch.x * (tex.width - 1)), Mathf.RoundToInt(ianch.y * (tex.height - 1)), Color.red);
+        }
+
+        var selfanchor = anchorSet[i];
+        tex.SetPixel(Mathf.RoundToInt(selfanchor.x * (tex.width - 1)), Mathf.RoundToInt(selfanchor.y * (tex.height - 1)), Color.green);
+
+        tex.Apply();
+
+        anchorTextures[i] = tex;
+      }
+    }
+  }
+  */
   // Drag variables
   private bool dragActiveBox;
   private int dragSetState;
@@ -202,6 +255,20 @@ public class MapEditorWindow : EditorWindow
         DrawSolidRectangle(m, left, bot, cell, faceColor);
       }
     }
+
+    // New map size
+    var newMapSize = new Vector3(length_scr, 0f, width_scr) * cell;
+    var oldMapSize = new Vector3(instance.length, 0f, instance.width) * cell;
+    var position = Vector3.Scale(new Vector3(-0.5f, 0, -0.5f), newMapSize) + 
+      Vector3.Scale(new Vector3(-0.5f + anchor.x, 0, -0.5f + anchor.y), oldMapSize - newMapSize); 
+
+    Handles.DrawSolidRectangleWithOutline( new Vector3[] {
+      position,
+      position + Vector3.Scale(Vector3.right, newMapSize),
+      position + Vector3.Scale(Vector3.one - Vector3.up, newMapSize),
+      position + Vector3.Scale(Vector3.forward, newMapSize)
+      },
+      Color.clear, Color.green);
   }
 
   /// <summary>

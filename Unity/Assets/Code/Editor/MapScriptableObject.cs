@@ -188,11 +188,18 @@ public class MapScriptableObject : ScriptableObject {
 
   #region Resizer
 
-  public void Resize(int length, int width){
+  public void Resize(int length, int width, Vector2 anchor){
     var n_size = length * width;
 
-    var x_offset = (this.length - length) / 2;
-    var y_offset = (this.width - width) / 2;
+    int x_offset, y_offset;
+
+    if (anchor.x == 0f)       x_offset = 0;
+    else if (anchor.x == 1f)  x_offset = this.length - length;
+    else                      x_offset = (this.length - length) / 2;
+
+    if (anchor.y == 0f)       y_offset = 0;
+    else if (anchor.y == 1f)  y_offset = this.width - width;
+    else                      y_offset = (this.width - width) / 2;
 
     int[] filled = new int[Mathf.CeilToInt(n_size / (float)CELLS_PER_INT)];
 
