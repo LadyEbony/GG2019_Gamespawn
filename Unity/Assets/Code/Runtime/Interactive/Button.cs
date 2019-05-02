@@ -8,8 +8,13 @@ public class Button : WallInteractive {
 
   public Material OrbMaterial { get; private set; }
   public Light OrbLight { get; private set; }
-  public readonly Color SelectColor = new Color(1f, 0f, .76f);
-  public readonly Color DeselectColor = new Color(.28f, 0f, .21f);
+
+  private bool selected;
+  [Header("Selection ")]
+  [SerializeField] private Color SelectColor = new Color(1f, 0f, .76f);
+  [SerializeField] private Color DeselectColor = new Color(.28f, 0f, .21f);
+  [SerializeField] private float fadeTime = 0.25f;
+  private float fadeDuration = 0.0f;
 
   public override void Awake() {
     base.Awake();
@@ -30,17 +35,28 @@ public class Button : WallInteractive {
     }
   }
 
+  private void Update() {
+    var color = Color.Lerp(DeselectColor, SelectColor, fadeDuration / fadeTime);
+
+    if (OrbMaterial)
+      OrbMaterial.SetColor("_Color", color);
+    if (OrbLight)
+      OrbLight.color = color;
+
+    fadeDuration = Mathf.Clamp(fadeDuration + (selected ? Time.deltaTime : -Time.deltaTime), 0.0f, fadeTime);
+  }
+
   public override void Interact(PlayerController pc) {
     if (bevent) bevent.Interact(pc, this);
   }
 
   public override void Select(PlayerController pc) {
-    OrbMaterial.SetColor("_Color", SelectColor);
-    OrbLight.color = SelectColor;
+    selected = true;
+    if (pc == null) fadeDuration = fadeTime;
   }
 
   public override void Deselect(PlayerController pc) {
-    OrbMaterial.SetColor("_Color", DeselectColor);
-    OrbLight.color = DeselectColor;
+    selected = false;
+    if (pc == null) fadeDuration = 0.0f;
   }
 }

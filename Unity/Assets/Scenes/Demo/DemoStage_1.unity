@@ -1212,6 +1212,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Walls:
   - {fileID: 1193554882}
+  LaserPrefab: {fileID: 0}
+  time: 0
 --- !u!4 &105138522 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2202771710179652057, guid: 5b015b6bfeaa22840adcaac9c1f92611,
@@ -21882,6 +21884,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Walls:
   - {fileID: 1050731336}
+  LaserPrefab: {fileID: 1836201703236221237, guid: 321d08bceb749cc44a2603c5fbe8c291,
+    type: 3}
+  time: 0.125
 --- !u!114 &743821668
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21894,6 +21899,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c0ce73ef27f6445bcf8b66b62ed112, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SelectColor: {r: 1, g: 0, b: 0.76, a: 1}
+  DeselectColor: {r: 0.28, g: 0, b: 0.21, a: 1}
+  fadeTime: 0.125
 --- !u!114 &743821669
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34156,6 +34164,8 @@ MonoBehaviour:
   Walls:
   - {fileID: 2135670474}
   - {fileID: 1187563755}
+  LaserPrefab: {fileID: 0}
+  time: 0
 --- !u!4 &1614441125 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2202771710179652057, guid: 5b015b6bfeaa22840adcaac9c1f92611,
