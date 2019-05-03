@@ -158,34 +158,7 @@ public class MapEditorWindow : EditorWindow
     length_scr = instance.length;
     width_scr = instance.width;
   }
-  /*
-  private void CreateAnchorTextures() {
-    if (anchorTextures == null || anchorTextures.Length < anchorSet.Length){
-      Texture2D tex;
 
-      anchorTextures = new Texture2D[anchorSet.Length];
-      for(var i = 0; i < anchorSet.Length; i++){
-        tex = new Texture2D(7, 7);
-        for(var y = 0; y < tex.height; y++) {
-          for(var x = 0; x < tex.width; x++){
-            tex.SetPixel(x, y, Color.clear);
-          }
-        }
-
-        foreach(var ianch in anchorSet){
-          tex.SetPixel(Mathf.RoundToInt(ianch.x * (tex.width - 1)), Mathf.RoundToInt(ianch.y * (tex.height - 1)), Color.red);
-        }
-
-        var selfanchor = anchorSet[i];
-        tex.SetPixel(Mathf.RoundToInt(selfanchor.x * (tex.width - 1)), Mathf.RoundToInt(selfanchor.y * (tex.height - 1)), Color.green);
-
-        tex.Apply();
-
-        anchorTextures[i] = tex;
-      }
-    }
-  }
-  */
   // Drag variables
   private bool dragActiveBox;
   private int dragSetState;
@@ -369,10 +342,11 @@ public class MapEditorWindow : EditorWindow
 
     var size = instance.cellsize;
     var height = instance.height;
-    CreateMap(instance.baseWallGameobject,    mapParent, new Vector3(size, height, size), Vector3.one * 0.5f,               (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Wall));
-    CreateMap(instance.baseGroundGameobject,  mapParent, new Vector3(size, 1f, size),     new Vector3(0.5f, 0.0f, 0.5f),    (i) => { var temp = instance.GetCellValue(i); return temp == (int)MapScriptableObject.CellType.Ground || temp == (int)MapScriptableObject.CellType.WallFloor; });
-    //CreateMap(instance.baseWallGameobject, mapParent, instance.height, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.WallFloor));
+    CreateMap(instance.baseWallGameobject,    mapParent,        new Vector3(size, height, size), Vector3.one * 0.5f,               (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Wall));
+    CreateMap(instance.baseGroundGameobject,  mapParent,        new Vector3(size, 1f, size),     new Vector3(0.5f, 0.0f, 0.5f),    (i) => { var temp = instance.GetCellValue(i); return temp == (int)MapScriptableObject.CellType.Ground || temp == (int)MapScriptableObject.CellType.WallFloor; });
+    CreateMap(instance.baseWallGameobject,    mapParent.parent, new Vector3(size, height, size), Vector3.one * 0.5f,               (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.WallFloor));
     //CreateMap(instance.baseWallGameobject, mapParent, instance.height, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.WallPitfall));
+
   }
 
   private void CreateMap(GameObject prefab, Transform parent, Vector3 sizeScale, Vector3 offsetScale, System.Func<int, bool> compareFunc){
@@ -491,8 +465,6 @@ public class MapEditorWindow : EditorWindow
       var scaledMesh = Instantiate(sharedMesh);
       MeshExtender.ScaleMesh(scaledMesh, scale);
       temp.GetComponent<MeshFilter>().sharedMesh = scaledMesh;
-
-
     }
 
     Debug.LogFormat("Created {0} {1}.", zones.Count, wallPrefab.name);
