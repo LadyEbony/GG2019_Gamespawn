@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour, IWeight, IItem {
   public PlayerAbility MouseOveride;
 
   public NavMeshAgent nva { get; private set; }
+  public PlayerManager manager { get; private set; }
   private PlayerAbility[] abilities;
 
   private Vector3 velocity;
@@ -34,6 +35,7 @@ public class PlayerController : MonoBehaviour, IWeight, IItem {
 
   private void Awake() {
     nva = GetComponent<NavMeshAgent>();
+    manager = GetComponent<PlayerManager>();
     if (!nva) Debug.LogFormat("Missing Nav Mesh Agent component");
 
     abilities = transform.Find("Abilities").GetComponentsInChildren<PlayerAbility>();

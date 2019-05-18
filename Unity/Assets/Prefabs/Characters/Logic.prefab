@@ -194,6 +194,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 637f6a7838d3da945a8ce89972d91d02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CharacterName: Amica
+  Icon: {fileID: 21300000, guid: b33b3c9ca8ae57c44b27d8cb4c13f3f9, type: 3}
+  IconColor: {r: 0, g: 1, b: 1, a: 1}
 --- !u!114 &124346152331572579
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -211,6 +214,7 @@ MonoBehaviour:
   DisableMovement: 0
   DisableRotation: 0
   DisableSwitch: 0
+  disableNavMesh: 0
 --- !u!114 &124346152331572577
 MonoBehaviour:
   m_ObjectHideFlags: 0
