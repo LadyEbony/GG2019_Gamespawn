@@ -17,9 +17,10 @@ public class Event_WallToggle : InteractiveEvent {
       wall.GetComponent<Animator>().Play(state ? "Hide" : "Show");
       collider.enabled = !state;
 
+      var mesh = wall.GetComponentInChildren<MeshRenderer>();
       var comp = Instantiate(LaserPrefab, interactive.transform.position, Quaternion.identity, null).GetComponent<Laser>();
-      comp.initial = interactive.transform.position;
-      comp.destination = wall.transform.position;
+      comp.initial = interactive.transform;
+      comp.destination = mesh.transform;
       comp.time = time;
     }
 

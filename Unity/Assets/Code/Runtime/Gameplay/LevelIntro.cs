@@ -29,13 +29,15 @@ public class LevelIntro : MonoBehaviour {
         if (c.path.Length == 1) c.done = true;
       }
     }
+
+    GetComponent<Animator>().Play("Enter");
   }
 
-  public void AnimateWalk(){
-    StartCoroutine(AnimateCoroutine());
+  public void Enter(){
+    StartCoroutine(EnterCoroutine());
   }
 
-  private IEnumerator AnimateCoroutine(){
+  private IEnumerator EnterCoroutine(){
     Character c;
     Transform t;
     PlayerController pc;

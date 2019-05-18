@@ -50,7 +50,11 @@ namespace GameSpawn {
     }
 
     public override bool Intersect(CylinderTriggerBounds bounds, out float sqrDistance) {
-      return BoundCollider.Intersect(bounds, this, out sqrDistance);
+      return BoundCollider.Intersect(this, bounds, out sqrDistance);
+    }
+
+    public override bool Intersect(SphereTriggerBounds bounds, out float sqrDistance) {
+      return BoundCollider.Intersect(this, bounds, out sqrDistance);
     }
 
     public override void OnDrawGizmosSelected() {
