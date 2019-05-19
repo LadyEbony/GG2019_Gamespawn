@@ -7,20 +7,27 @@ using GameSpawn;
 [RequireComponent(typeof(CylinderTriggerBounds))]
 public class Weight : InteractiveBase {
 
+  private InteractiveEvent bevent;
   [SerializeField] private IWeight focus;
-  [SerializeField] private bool status;
 
-  private InteractiveEvent onevent;
-  private InteractiveEvent offevent;
+  public Light[] CandleLights { get; private set; }
+
+  private bool selected;
+  [Header("Selection ")]
+  [SerializeField] private Color SelectColor = new Color(1f, 0f, .76f);
+  [SerializeField] private Color DeselectColor = new Color(.28f, 0f, .21f);
+  [SerializeField] private float SelectLightRange = 0.25f;
+  [SerializeField] private float DeselectLightRange = 0.5f;
+  [SerializeField] private float fadeTime = 0.25f;
+  private float fadeDuration = 0.0f;
 
   public override void Awake() {
     base.Awake();
 
     if (!CylinderBounds) Debug.LogErrorFormat("{0} does not have a cylinder trigger bounds!", gameObject.name);
 
-    var events = GetComponents<InteractiveEvent>();
-    if (events.Length >= 1) onevent = events[0];
-    if (events.Length >= 2) offevent = events[1];
+    bevent = GetComponent<InteractiveEvent>();
+    CandleLights = GetComponentsInChildren<Light>();
   }
 
   private void FixedUpdate() {
@@ -58,16 +65,20 @@ public class Weight : InteractiveBase {
     }
 
     var statusEvent = focus != null;
-    if (statusEvent ^ status){
-      status = statusEvent;
-      if (status) {
-        if (onevent != null) onevent.Interact(null, null);
-        Material.SetColor("_Color", Color.green);
-      } else { 
-        if (offevent != null) offevent.Interact(null, null);
-        Material.SetColor("_Color", Color.red);
-      }
+    if (statusEvent ^ selected) {
+      selected = statusEvent;
+      bevent.Interact(null, this);
     }
+
+    var color = Color.Lerp(DeselectColor, SelectColor, fadeDuration / fadeTime);
+    var range = Mathf.Lerp(DeselectLightRange, SelectLightRange, fadeDuration / fadeTime);
+
+    if (Material)
+      Material.color = color;
+    foreach (var l in CandleLights)
+      l.range = range;
+
+    fadeDuration = Mathf.Clamp(fadeDuration + (selected ? Time.deltaTime : -Time.deltaTime), 0.0f, fadeTime);
 
   }
 

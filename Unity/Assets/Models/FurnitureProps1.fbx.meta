@@ -1,0 +1,164 @@
+fileFormatVersion: 2
+guid: 992ef11ebd289e4429bf5f91f13d7729
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: Candle1
+    100002: Candle2
+    100004: Candle3
+    100006: Candlestick1
+    100008: Candlestick2
+    100010: Chair1
+    100012: Chair2
+    100014: Cushion
+    100016: Desk
+    100018: Double Sconce
+    100020: //RootNode
+    100022: Rug
+    100024: Single Sconce
+    100026: Stool
+    100028: Table
+    400000: Candle1
+    400002: Candle2
+    400004: Candle3
+    400006: Candlestick1
+    400008: Candlestick2
+    400010: Chair1
+    400012: Chair2
+    400014: Cushion
+    400016: Desk
+    400018: Double Sconce
+    400020: //RootNode
+    400022: Rug
+    400024: Single Sconce
+    400026: Stool
+    400028: Table
+    2100000: Default
+    2300000: Candle1
+    2300002: Candle2
+    2300004: Candle3
+    2300006: Candlestick1
+    2300008: Candlestick2
+    2300010: Chair1
+    2300012: Chair2
+    2300014: Cushion
+    2300016: Desk
+    2300018: Double Sconce
+    2300020: Rug
+    2300022: Single Sconce
+    2300024: Stool
+    2300026: Table
+    3300000: Candle1
+    3300002: Candle2
+    3300004: Candle3
+    3300006: Candlestick1
+    3300008: Candlestick2
+    3300010: Chair1
+    3300012: Chair2
+    3300014: Cushion
+    3300016: Desk
+    3300018: Double Sconce
+    3300020: Rug
+    3300022: Single Sconce
+    3300024: Stool
+    3300026: Table
+    4300000: Single Sconce
+    4300002: Double Sconce
+    4300004: Candle1
+    4300006: Candle2
+    4300008: Candle3
+    4300010: Candlestick1
+    4300012: Candlestick2
+    4300014: Chair1
+    4300016: Chair2
+    4300018: Rug
+    4300020: Stool
+    4300022: Desk
+    4300024: Table
+    4300026: Cushion
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 1
+    hasPreviousCalculatedGlobalScale: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

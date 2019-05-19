@@ -49,7 +49,7 @@ public class Button : WallInteractive {
     var color = Color.Lerp(DeselectColor, SelectColor, fadeDuration / fadeTime);
 
     if (OrbMaterial)
-      OrbMaterial.SetColor("_Color", color);
+      OrbMaterial.color = color;
     if (OrbLight)
       OrbLight.color = color;
     if (UIIcon)

@@ -30,6 +30,8 @@ public class LevelIntro : MonoBehaviour {
       }
     }
 
+    PlayerInput.instance.DisableInput++;
+
     GetComponent<Animator>().Play("Enter");
   }
 
@@ -69,6 +71,7 @@ public class LevelIntro : MonoBehaviour {
     foreach(var temp in characters){
       temp.refe.DisableNavMesh--;
     }
+    PlayerInput.instance.DisableInput--;
   }
 
   private static readonly Color[] gizmoColors = new Color[] { Color.red, Color.gray, Color.blue };

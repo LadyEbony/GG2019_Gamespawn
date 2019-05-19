@@ -1,0 +1,13 @@
+newmtl Wall
+map_Kd TexturesCom_Brick_Rustic2_1K_albedo.tif
+bump TexturesCom_Brick_Rustic2_1K_normal.tif
+disp TexturesCom_Brick_Rustic2_1K_height.tif
+Kd 0.8679245 0.8679245 0.8679245
+d 1
+
+newmtl Ceiling
+map_Kd TexturesCom_WoodSiding6_2x2_512_albedo.tif
+bump TexturesCom_WoodSiding6_2x2_512_normal.tif
+Kd 1 1 1
+d 1
+
