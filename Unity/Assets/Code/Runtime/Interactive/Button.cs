@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using TMPro;
+
 public class Button : WallInteractive {
 
   private InteractiveEvent bevent;
 
   public Material OrbMaterial { get; private set; }
   public Light OrbLight { get; private set; }
+  public SpriteRenderer UIIcon { get; private set; }
+  public TextMeshPro UIText { get; private set; }
 
   private bool selected;
   [Header("Selection ")]
@@ -33,6 +37,12 @@ public class Button : WallInteractive {
       }
       Deselect(null);
     }
+
+    var uitransform = GameObjectExtender.FindChildWithTag(transform, "Main UI");
+    if (uitransform){
+      UIIcon = uitransform.GetComponentInChildren<SpriteRenderer>();
+      UIText = uitransform.GetComponentInChildren<TextMeshPro>();
+    }
   }
 
   private void Update() {
@@ -42,6 +52,10 @@ public class Button : WallInteractive {
       OrbMaterial.SetColor("_Color", color);
     if (OrbLight)
       OrbLight.color = color;
+    if (UIIcon)
+      UIIcon.color = Color.white * (fadeDuration / fadeTime) * 0.75f;
+    if (UIText)
+      UIText.color = Color.white * (fadeDuration / fadeTime) * 0.75f;
 
     fadeDuration = Mathf.Clamp(fadeDuration + (selected ? Time.deltaTime : -Time.deltaTime), 0.0f, fadeTime);
   }

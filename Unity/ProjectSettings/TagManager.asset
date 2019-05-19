@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Emission
   - Main Material
+  - Main UI
   layers:
   - Default
   - TransparentFX
