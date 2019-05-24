@@ -25,6 +25,7 @@ public class LevelIntro : MonoBehaviour {
         refe = c.refe;
         refe.DisableNavMesh++;
         refe.transform.position = c.path[0] + selfPosition;
+        refe.transform.rotation = Quaternion.LookRotation(c.path[1] - c.path[0], Vector3.up);
         c.index = 1;
         if (c.path.Length == 1) c.done = true;
       }
@@ -55,7 +56,9 @@ public class LevelIntro : MonoBehaviour {
         pc = c.refe;
         t = pc.transform;
         destinationPosition = selfPosition + c.path[c.index];
-        t.position = Vector3.MoveTowards(t.position, destinationPosition, pc.nva.speed * Time.deltaTime);
+        var newpos = Vector3.MoveTowards(t.position, destinationPosition, pc.nva.speed * Time.deltaTime);
+        t.position = newpos;
+        t.rotation = Quaternion.RotateTowards(t.rotation, Quaternion.LookRotation((destinationPosition - newpos).normalized, Vector3.up), pc.nva.angularSpeed * Time.deltaTime);
         if (Vector3.SqrMagnitude(t.position - selfPosition - c.path[c.index]) < 0.25f) {
           c.index++;
           if (c.index == c.path.Length) c.done = true;

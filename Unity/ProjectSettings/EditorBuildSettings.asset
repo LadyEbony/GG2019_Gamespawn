@@ -12,9 +12,12 @@ EditorBuildSettings:
     path: Assets/Scenes/Demo/DemoStage_1.unity
     guid: 70624398da460bd45a8c07e78e76ea4d
   - enabled: 1
+    path: Assets/Scenes/Demo/DemoStage_2.unity
+    guid: 2c764ce56d631d2438201d920e7926ab
+  - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 81f850656ea5c894f8ea4ffb1b2df1c5
-  - enabled: 1
-    path: Assets/Scenes/_PersistantScene.unity
-    guid: 38563ca68e0abc94a9c508a184e431f3
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
   m_configObjects: {}

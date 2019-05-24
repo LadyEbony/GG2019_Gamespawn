@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using GameSpawn;
+using UnityEngine.AI;
 
 public class Item : Interactive, IItem, IWeight {
   
@@ -45,12 +46,14 @@ public class Item : Interactive, IItem, IWeight {
   }
 
   private void Update() {
+    // Box color
     if (weighted){
       MaterialInner.color = WeightedColor;
     } else {
       MaterialInner.color = StandardColor;
     }
 
+    // Selection particles
     if (Particle) {
       var pcolor = Color.Lerp(Color.clear, selectedcolor, fadeDuration / fadeTime);
 
@@ -68,6 +71,11 @@ public class Item : Interactive, IItem, IWeight {
 
     }
 
+    // Out of bounds
+    if (transform.position.y <= -1f){
+      Bounce(5.0f);
+    }
+
     fadeDuration = Mathf.Clamp(fadeDuration + (selectedpc != null ? Time.deltaTime : -Time.deltaTime), 0.0f, fadeTime);
   }
 
@@ -79,6 +87,8 @@ public class Item : Interactive, IItem, IWeight {
     gameObject.layer = LayerMask.NameToLayer("ItemPickup");
 
     if (pickupEvent) pickupEvent.Interact(pc, this);
+
+    if (bounce != null) StopCoroutine(bounce);
   }
 
   public void Drop(PlayerController pc) {
@@ -110,8 +120,12 @@ public class Item : Interactive, IItem, IWeight {
     weighted = false;
   }
 
-  public void Bounce(Vector3 destination){
-    StartCoroutine(BounceCoroutine(destination));
+  private Coroutine bounce;
+  public void Bounce(float range){
+    NavMeshHit hit;
+    if (NavMesh.SamplePosition(transform.position, out hit, range, NavMesh.AllAreas)) {
+      bounce = StartCoroutine(BounceCoroutine(hit.position));
+    } 
   }
 
   private IEnumerator BounceCoroutine(Vector3 destination) {
@@ -124,19 +138,78 @@ public class Item : Interactive, IItem, IWeight {
     gameObject.layer = LayerMask.NameToLayer("ItemPickup");
 
     var startposition = transform.position;
+    var startrotation = transform.rotation;
+    var finalrotation = GetClosestVector(transform.rotation, Vector3.up);
     var time = 0.0f;
     while(time < 1.0f){
       transform.position = Vector3.Lerp(startposition, destination, time);
       transform.position += new Vector3(0, Mathf.Sin(Mathf.PI * time) * bounceHeight, 0);
+      transform.rotation = Quaternion.Slerp(startrotation, finalrotation, time);
       yield return null;
 
       time += Time.deltaTime / bounceTime;
     }
     transform.position = destination;
+    transform.rotation = finalrotation;
 
     Rigidbody.isKinematic = false;
     Rigidbody.detectCollisions = true;
     Rigidbody.useGravity = true;
     gameObject.layer = LayerMask.NameToLayer("Item");
+
+    bounce = null;
   }
+
+  private Quaternion GetClosestVector(Quaternion direction, Vector3 upVector){
+    Vector3 final = Vector3.forward;
+    float dot = 0.0f;
+
+    Vector3 tempv;
+    float tempd;
+
+    tempv = direction * Vector3.forward;
+    tempd = Vector3.Dot(tempv, upVector);
+    if (tempd > dot){
+      final = tempv;
+      dot = tempd;
+    }
+
+    tempv = direction * Vector3.back;
+    tempd = Vector3.Dot(tempv, upVector);
+    if (tempd > dot) {
+      final = tempv;
+      dot = tempd;
+    }
+
+    tempv = direction * Vector3.right;
+    tempd = Vector3.Dot(tempv, upVector);
+    if (tempd > dot) {
+      final = tempv;
+      dot = tempd;
+    }
+
+    tempv = direction * Vector3.left;
+    tempd = Vector3.Dot(tempv, upVector);
+    if (tempd > dot) {
+      final = tempv;
+      dot = tempd;
+    }
+
+    tempv = direction * Vector3.up;
+    tempd = Vector3.Dot(tempv, upVector);
+    if (tempd > dot) {
+      final = tempv;
+      dot = tempd;
+    }
+
+    tempv = direction * Vector3.down;
+    tempd = Vector3.Dot(tempv, upVector);
+    if (tempd > dot) {
+      final = tempv;
+      dot = tempd;
+    }
+
+    return Quaternion.LookRotation(direction * Vector3.forward, final);
+  }
+
 }

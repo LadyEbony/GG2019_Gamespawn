@@ -27,7 +27,7 @@ public class MapScriptableObject : ScriptableObject {
   public int height = 2;
   public float cellsize = 1;
 
-  public enum CellType { Ground, Wall, Pitfall, WallFloor, WallPitfall }
+  public enum CellType { Ground, Wall, Empty, WallAlt, Pitfall }
 
   public const int CELLS_PER_INT = 8;
   public const int CELL_TYPE_BASE = 15;
@@ -41,6 +41,7 @@ public class MapScriptableObject : ScriptableObject {
 
   public GameObject baseGroundGameobject;
   public GameObject baseWallGameobject;
+  public GameObject basePitfallGameobject;
 
   #region Get Fill Statuses
 
@@ -121,13 +122,13 @@ public class MapScriptableObject : ScriptableObject {
   }
 
   public int GetRightDirectionIndex(int index) {
-    if ((index / width) == ((index + 1) / width))
+    if (GetWidth(index) == GetWidth(index + 1))
       return index + 1;
     return -1;
   }
 
   public int GetLeftDirectionIndex(int index) {
-    if ((index / width) == ((index - 1) / width))
+    if (GetWidth(index) == GetWidth(index - 1))
       return index - 1;
     return -1;
   }
@@ -231,12 +232,12 @@ public class MapScriptableObject : ScriptableObject {
         return Color.clear;
       case (int)CellType.Wall:
         return Color.red;
-      case (int)CellType.Pitfall:
+      case (int)CellType.Empty:
         return Color.blue;
-      case (int)CellType.WallFloor:
+      case (int)CellType.WallAlt:
+        return Color.yellow;
+      case (int)CellType.Pitfall:
         return Color.magenta;
-      case (int)CellType.WallPitfall:
-        return Color.cyan;
     }
     return Color.white;
   }

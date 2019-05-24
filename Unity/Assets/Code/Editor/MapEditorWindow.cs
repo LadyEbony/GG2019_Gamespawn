@@ -100,6 +100,7 @@ public class MapEditorWindow : EditorWindow
     EditorGUILayout.Separator();
     instance.baseGroundGameobject = (GameObject)EditorGUILayout.ObjectField("Ground Prefab", instance.baseGroundGameobject, typeof(GameObject), false);
     instance.baseWallGameobject = (GameObject)EditorGUILayout.ObjectField("Wall Prefab", instance.baseWallGameobject, typeof(GameObject), false);
+    instance.basePitfallGameobject = (GameObject)EditorGUILayout.ObjectField("Pitfall Prefab", instance.basePitfallGameobject, typeof(GameObject), false);
 
     EditorGUILayout.Separator();
 
@@ -343,9 +344,11 @@ public class MapEditorWindow : EditorWindow
     var size = instance.cellsize;
     var height = instance.height;
     CreateMap(instance.baseWallGameobject,    mapParent,        new Vector3(size, height, size), Vector3.one * 0.5f,               (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Wall));
-    CreateMap(instance.baseGroundGameobject,  mapParent,        new Vector3(size, 1f, size),     new Vector3(0.5f, 0.0f, 0.5f),    (i) => { var temp = instance.GetCellValue(i); return temp == (int)MapScriptableObject.CellType.Ground || temp == (int)MapScriptableObject.CellType.WallFloor; });
-    CreateMap(instance.baseWallGameobject,    mapParent.parent, new Vector3(size, height, size), Vector3.one * 0.5f,               (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.WallFloor));
-    //CreateMap(instance.baseWallGameobject, mapParent, instance.height, (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.WallPitfall));
+    CreateMap(instance.baseGroundGameobject,  mapParent,        new Vector3(size, 1f, size),     new Vector3(0.5f, 0.0f, 0.5f),    (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Ground));
+    CreateMap(instance.baseWallGameobject,    mapParent.parent, new Vector3(size, height, size), Vector3.one * 0.5f,               (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.WallAlt));
+    CreateMap(instance.basePitfallGameobject, mapParent,        new Vector3(size, 1f, size), new Vector3(0.5f, -0.5f, 0.5f),    (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Pitfall));
+
+    EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
 
   }
 
