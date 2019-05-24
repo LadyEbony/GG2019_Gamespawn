@@ -9,6 +9,8 @@ public class Event_WallToggle : InteractiveEvent {
   public GameObject LaserPrefab;
   public float time;
 
+  public bool leftright;
+
   public override void Interact(PlayerController pc, InteractiveBase interactive) {
     foreach (var wall in Walls) {
       var collider = wall.GetComponent<Collider>();
@@ -26,5 +28,23 @@ public class Event_WallToggle : InteractiveEvent {
 
     foreach (var surface in NavMeshSurface.activeSurfaces)
       surface.BuildNavMesh();
+
+    foreach(var wall in Walls){
+      var collider = wall.GetComponent<BoxCollider>();
+      var boxes = Physics.OverlapBox(collider.bounds.center, collider.bounds.extents, Quaternion.identity, 1 << LayerMask.NameToLayer("Item"));
+
+      var navmeshsize = Mathf.Max(collider.size.x, collider.size.z);
+
+      foreach (var box in boxes) {
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(box.transform.position, out hit, navmeshsize, NavMesh.AllAreas)){
+          box.GetComponent<Item>().Bounce(hit.position);
+        } else {
+          Debug.Log("uhh herlp");
+        }
+      }
+    }
+
   }
+
 }

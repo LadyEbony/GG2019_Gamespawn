@@ -4,12 +4,22 @@ ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
     100000: //RootNode
+    100002: Witchcraft-Inner
+    100004: Witchcraft-Shell
     400000: //RootNode
+    400002: Witchcraft-Inner
+    400004: Witchcraft-Shell
     2100000: unnamed
     2300000: //RootNode
+    2300002: Witchcraft-Inner
+    2300004: Witchcraft-Shell
     3300000: //RootNode
+    3300002: Witchcraft-Inner
+    3300004: Witchcraft-Shell
     4300000: Circle
     4300002: Witchcraft
+    4300004: Witchcraft-Inner
+    4300006: Witchcraft-Shell
     7400000: Default Take
     9500000: //RootNode
   externalObjects: {}
