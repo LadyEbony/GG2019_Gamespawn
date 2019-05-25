@@ -6122,7 +6122,6 @@ MonoBehaviour:
   LaserPrefab: {fileID: 1836201703236221237, guid: 321d08bceb749cc44a2603c5fbe8c291,
     type: 3}
   time: 0.25
-  leftright: 1
 --- !u!114 &743821668
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7430,7 +7429,6 @@ MonoBehaviour:
   LaserPrefab: {fileID: 1836201703236221237, guid: 321d08bceb749cc44a2603c5fbe8c291,
     type: 3}
   time: 0.25
-  leftright: 1
 --- !u!114 &931221300
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -9,8 +9,6 @@ public class Event_WallToggle : InteractiveEvent {
   public GameObject LaserPrefab;
   public float time;
 
-  public bool leftright;
-
   public override void Interact(PlayerController pc, InteractiveBase interactive) {
     foreach (var wall in Walls) {
       var collider = wall.GetComponent<Collider>();

@@ -23,4 +23,8 @@ public abstract class InteractiveBase : MonoBehaviour
       SphereBounds = Bounds as SphereTriggerBounds;
     }
   }
+
+  public virtual void DisableEvents(){
+    
+  }
 }

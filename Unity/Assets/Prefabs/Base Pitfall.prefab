@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 7853283367808554717}
   - component: {fileID: 3992532491614847710}
   - component: {fileID: 6568296929192047174}
-  - component: {fileID: 5675502417260440084}
-  - component: {fileID: 4598636804965409713}
+  - component: {fileID: 1010691509743220419}
+  - component: {fileID: 8993723585819518105}
   m_Layer: 0
   m_Name: Base Pitfall
   m_TagString: Untagged
@@ -79,7 +79,7 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1882474521324336178}
   m_Mesh: {fileID: 4300000, guid: 2280bd947a482d74189b9fa0cd2ecbad, type: 3}
---- !u!65 &5675502417260440084
+--- !u!65 &1010691509743220419
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,7 +92,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &4598636804965409713
+--- !u!114 &8993723585819518105
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

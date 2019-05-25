@@ -84,7 +84,7 @@ public class Weight : InteractiveBase {
     var statusEvent = focus != null;
     if (statusEvent ^ selected) {
       selected = statusEvent;
-      bevent.Interact(null, this);
+      if (bevent) bevent.Interact(null, this);
     }
 
     var ratio = fadeDuration / fadeTime;
@@ -99,6 +99,11 @@ public class Weight : InteractiveBase {
 
     fadeDuration = Mathf.Clamp(fadeDuration + (selected ? Time.deltaTime : -Time.deltaTime), 0.0f, fadeTime);
 
+  }
+
+  public override void DisableEvents() {
+    Destroy(bevent);
+    bevent = null;
   }
 
 }
