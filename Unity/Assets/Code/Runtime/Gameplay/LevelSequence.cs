@@ -22,6 +22,11 @@ public class LevelSequence : MonoBehaviour {
     StartCoroutine(ProceedLevelAsync());
   }
 
+  public void ResetGame() {
+    levelIndex = -1;
+    StartCoroutine(ProceedLevelAsync());
+  }
+
   private IEnumerator ProceedLevelAsync(){
     AsyncOperation op;  
 

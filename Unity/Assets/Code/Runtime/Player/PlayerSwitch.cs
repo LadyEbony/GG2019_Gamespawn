@@ -53,6 +53,13 @@ public class PlayerSwitch : MonoBehaviour
 
     }
 
+    
+
+  }
+
+  public void ForceSelection(PlayerController pc){
+    if (pc != null)
+      Selected = pc;
   }
 
 }

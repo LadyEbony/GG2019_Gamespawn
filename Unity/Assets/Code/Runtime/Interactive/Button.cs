@@ -12,9 +12,11 @@ public class Button : WallInteractive {
   public Light OrbLight { get; private set; }
 
   private bool selected;
+  private bool disabled;
   [Header("Selection ")]
   [SerializeField] private Color SelectColor = new Color(1f, 0f, .76f);
   [SerializeField] private Color DeselectColor = new Color(.28f, 0f, .21f);
+  [SerializeField] private Color DisabledColor = new Color(0f, 0f, 0f);
   [SerializeField] private float fadeTime = 0.25f;
   private float fadeDuration = 0.0f;
 
@@ -39,14 +41,23 @@ public class Button : WallInteractive {
   }
 
   private void Update() {
-    var color = Color.Lerp(DeselectColor, SelectColor, fadeDuration / fadeTime);
+    Color color;
+    if (disabled) {
+      color = Color.Lerp(DisabledColor, SelectColor, fadeDuration / fadeTime);
+    } else {
+      color = Color.Lerp(DeselectColor, SelectColor, fadeDuration / fadeTime);    
+    }
 
     if (OrbMaterial)
       OrbMaterial.color = color;
     if (OrbLight)
       OrbLight.color = color;
 
-    fadeDuration = Mathf.Clamp(fadeDuration + (selected ? Time.deltaTime : -Time.deltaTime), 0.0f, fadeTime);
+    fadeDuration = Mathf.Clamp(fadeDuration + (selected && !disabled ? Time.deltaTime : -Time.deltaTime), 0.0f, fadeTime);
+
+    if (disabled && fadeDuration == 0.0f){
+      Destroy(this);
+    }
   }
 
   public override void Interact(PlayerController pc) {
@@ -61,5 +72,11 @@ public class Button : WallInteractive {
   public override void Deselect(PlayerController pc) {
     selected = false;
     if (pc == null) fadeDuration = 0.0f;
+  }
+
+  public override void DisableEvents() {
+    Destroy(bevent);
+    bevent = null;
+    disabled = true;
   }
 }

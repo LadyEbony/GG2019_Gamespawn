@@ -18,6 +18,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Demo/DemoStage_4.unity
     guid: cb7e40de700674140a87efd448c1d4da
   - enabled: 1
+    path: Assets/Scenes/Demo/DemoStage_6.unity
+    guid: 9b7fbefc4af08434ab4b948187407cc5
+  - enabled: 1
     path: Assets/Scenes/_PersistanceScene.unity
     guid: 20daed1a87879ef4ca9133d2271286ff
   m_configObjects: {}

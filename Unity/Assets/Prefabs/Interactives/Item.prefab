@@ -4904,6 +4904,8 @@ MonoBehaviour:
   StandardColor: {r: 1, g: 1, b: 1, a: 1}
   WeightedColor: {r: 0.713, g: 0, b: 1, a: 1}
   fadeTime: 0.25
+  bounceTime: 0.25
+  bounceHeight: 0.5
 --- !u!54 &7618964745649515662
 Rigidbody:
   m_ObjectHideFlags: 0

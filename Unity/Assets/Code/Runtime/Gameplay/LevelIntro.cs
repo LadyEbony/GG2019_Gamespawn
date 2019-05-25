@@ -32,6 +32,13 @@ public class LevelIntro : MonoBehaviour {
     }
 
     PlayerInput.instance.DisableInput++;
+    PlayerSwitch.instance.ForceSelection(characters[0].refe);
+
+    var cam = Camera.main.transform;
+    var cpos = cam.position;
+    var fpos = characters[0].refe.transform.position;
+    fpos.y = cpos.y;
+    cam.position = fpos;
 
     GetComponent<Animator>().Play("Enter");
   }
