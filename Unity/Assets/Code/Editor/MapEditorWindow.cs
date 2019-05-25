@@ -343,10 +343,11 @@ public class MapEditorWindow : EditorWindow
 
     var size = instance.cellsize;
     var height = instance.height;
-    CreateMap(instance.baseWallGameobject,    mapParent,        new Vector3(size, height, size), Vector3.one * 0.5f,               (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Wall));
-    CreateMap(instance.baseGroundGameobject,  mapParent,        new Vector3(size, 1f, size),     new Vector3(0.5f, 0.0f, 0.5f),    (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Ground));
-    CreateMap(instance.baseWallGameobject,    mapParent.parent, new Vector3(size, height, size), Vector3.one * 0.5f,               (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.WallAlt));
-    CreateMap(instance.basePitfallGameobject, mapParent,        new Vector3(size, 1f, size), new Vector3(0.5f, -0.5f, 0.5f),    (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Pitfall));
+    CreateMap(instance.baseWallGameobject,    mapParent,        new Vector3(size, height, size), Vector3.one * 0.5f,                (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Wall));
+    CreateMap(instance.baseGroundGameobject,  mapParent,        new Vector3(size, 1f, size),     new Vector3(0.5f, 0.0f, 0.5f),     (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Ground));
+    CreateMap(instance.baseWallGameobject,    mapParent.parent, new Vector3(size, height, size), Vector3.one * 0.5f,                (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.WallAlt));
+    CreateMap(instance.basePitfallGameobject, mapParent,        new Vector3(size, 1f, size), new Vector3(0.5f, -0.5f, 0.5f),        (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.Pitfall));
+    CreateMap(instance.baseGroundGameobject,  mapParent.parent, new Vector3(size, 1f, size), new Vector3(0.5f, 0.1f, 0.5f),         (i) => instance.GetCellType(i, (int)MapScriptableObject.CellType.GroundAlt));
 
     EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
 

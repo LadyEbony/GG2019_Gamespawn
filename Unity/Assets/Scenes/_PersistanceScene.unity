@@ -143,7 +143,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8953cb61fe56a74fa213580561fe9d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelBuildIndexes: 000000000100000002000000
+  levelBuildIndexes: 00000000010000000200000003000000
   levelCurrentBuildIndex: 0
   levelIndex: 0
 --- !u!4 &838238735

@@ -14,7 +14,12 @@ public class Event_WallToggle : InteractiveEvent {
       var collider = wall.GetComponent<Collider>();
       var state = collider.enabled;
 
-      wall.GetComponent<Animator>().Play(state ? "Hide" : "Show");
+      if (wall.gameObject.layer == LayerMask.NameToLayer("Wall")) {
+        wall.GetComponent<Animator>().Play(state ? "Hide" : "Show");
+      } else {
+        wall.GetComponent<Animator>().Play(state ? "Disappear" : "Appear");
+      }
+
       collider.enabled = !state;
 
       var mesh = wall.GetComponentInChildren<MeshRenderer>();
