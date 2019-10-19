@@ -23,7 +23,7 @@ public class LevelIntro : MonoBehaviour {
       c = characters[i];
       if (c.path.Length > 0){
         refe = c.refe;
-        refe.DisableNavMesh++;
+        refe.disableNavMesh++;
         refe.transform.position = c.path[0] + selfPosition;
         refe.transform.rotation = Quaternion.LookRotation(c.path[1] - c.path[0], Vector3.up);
         c.index = 1;
@@ -31,7 +31,7 @@ public class LevelIntro : MonoBehaviour {
       }
     }
 
-    PlayerInput.instance.DisableInput++;
+    PlayerInput.instance.disableInput++;
     PlayerSwitch.instance.ForceSelection(characters[0].refe);
 
     var cam = Camera.main.transform;
@@ -79,9 +79,9 @@ public class LevelIntro : MonoBehaviour {
     }
 
     foreach(var temp in characters){
-      temp.refe.DisableNavMesh--;
+      temp.refe.disableNavMesh--;
     }
-    PlayerInput.instance.DisableInput--;
+    PlayerInput.instance.disableInput--;
   }
 
   private static readonly Color[] gizmoColors = new Color[] { Color.red, Color.gray, Color.blue };

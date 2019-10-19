@@ -18,7 +18,7 @@ public class TutorialWADS : MonoBehaviour
   }
 
   private void Update() {
-    if (PlayerInput.instance.DisableInput != 0) return;
+    if (PlayerInput.instance.disableInput != 0) return;
 
     if (PlayerInput.instance.GetDirectionInput != Vector3.zero){
       input = true;

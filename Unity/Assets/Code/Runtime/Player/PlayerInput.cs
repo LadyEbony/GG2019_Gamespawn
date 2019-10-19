@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInput : MonoBehaviour
-{
+public class PlayerInput : MonoBehaviour {
+
+  // so the question is, why?
+  // cause i wanted an easy place to store hold durations
+
   public struct AxisInput {
     public string axisName;
     public float value;
@@ -56,8 +59,11 @@ public class PlayerInput : MonoBehaviour
   public ButtonInput threeInput;
   public ButtonInput tabInput;
 
-  public int DisableInput = 0;
-  public int DisableSwitch = 0;
+  // Sprint
+  public ButtonInput shiftInput;
+
+  public int disableInput = 0;
+  public int disableSwitch = 0;
 
   private void Awake() {
     // Set singleton
@@ -78,6 +84,8 @@ public class PlayerInput : MonoBehaviour
     twoInput = new ButtonInput("Two");
     threeInput = new ButtonInput("Three");
     tabInput = new ButtonInput("Tab");
+
+    shiftInput = new ButtonInput("Shift");
   }
 
   private void FixedUpdate() {
@@ -92,10 +100,12 @@ public class PlayerInput : MonoBehaviour
     UpdateButtonInput(ref twoInput);
     UpdateButtonInput(ref threeInput);
     UpdateButtonInput(ref tabInput);
+
+    UpdateButtonInput(ref shiftInput);
   }
 
   private void UpdateAxisInput(ref AxisInput input){
-    input.value = DisableInput == 0 ? Input.GetAxisRaw(input.axisName) : 0.0f;
+    input.value = disableInput == 0 ? Input.GetAxisRaw(input.axisName) : 0.0f;
   }
 
   private void UpdateButtonInput(ref ButtonInput input){
@@ -113,7 +123,28 @@ public class PlayerInput : MonoBehaviour
 
   public Vector3 GetDirectionInput{
     get {
-      return new Vector3(horizontalInput.value, 0.0f, verticalInput.value).normalized;
+      var ct = Camera.main.transform;
+
+      // Get the forward and right for the camera, flatten them on the XZ plane, then renormalize
+      var fwd = ct.forward;
+      var right = ct.right;
+
+      fwd.y = 0;
+      right.y = 0;
+
+      fwd = fwd.normalized;
+      right = right.normalized;
+
+      var hor = horizontalInput.value;
+      var ver = verticalInput.value;
+
+      var delta = hor * right;
+      delta += ver * fwd;
+
+      // Clamp magnitude, so going diagonally isn't faster.
+      if (delta != Vector3.zero) delta = delta.normalized;
+
+      return delta;
     }
   }
 

@@ -22,10 +22,7 @@ public class LevelExit : MonoBehaviour
   }
 
   private IEnumerator EnterCoroutine() {
-    foreach(var player in GlobalList<PlayerController>.GetList){
-      player.DisableSwitch++;
-    }
-
+    PlayerInput.instance.disableInput++;
     yield return null;
   }
 
@@ -34,7 +31,7 @@ public class LevelExit : MonoBehaviour
 
     float sqr;
     foreach(var player in GlobalList<PlayerController>.GetList){
-      if(player.InteractiveBounds.Intersect(Bounds, out sqr)){
+      if(player.interactiveBounds.Intersect(Bounds, out sqr)){
         once = true;
         GetComponent<Animator>().Play("Exit");
       }

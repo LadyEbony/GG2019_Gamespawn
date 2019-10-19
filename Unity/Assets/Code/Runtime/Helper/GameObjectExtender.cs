@@ -16,4 +16,15 @@ public static class GameObjectExtender{
     return null;
   }
 
+  public static T GetFastComponentInChildren<T>(this Transform parent) where T : Component{
+    T item = null;
+
+    foreach(Transform t in parent){
+      item = t.GetComponent<T>();
+      if (item) return item;
+    }
+
+    return item;
+  }
+
 }

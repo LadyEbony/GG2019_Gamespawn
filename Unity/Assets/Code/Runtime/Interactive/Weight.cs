@@ -14,7 +14,8 @@ public class Weight : InteractiveBase {
   public Material FlowerMaterial { get; private set; }
   public Light[] CandleLights { get; private set; }
 
-  private bool selected;
+  private bool selected, disabled;
+  private Vector3 disabledscale;
   [Header("Selection ")]
   [SerializeField] private Color DeselectColor = new Color(.28f, 0f, .21f);
   [SerializeField] private Color SelectShellColor = new Color(1f, 0f, .76f);
@@ -22,6 +23,7 @@ public class Weight : InteractiveBase {
   [SerializeField] private float SelectLightRange = 0.25f;
   [SerializeField] private float DeselectLightRange = 0.5f;
   [SerializeField] private float fadeTime = 0.25f;
+  [SerializeField] private float disableTime = 1.0f;
   private float fadeDuration = 0.0f;
 
   public override void Awake() {
@@ -45,6 +47,8 @@ public class Weight : InteractiveBase {
   }
 
   private void FixedUpdate() {
+    if (disabled) return;
+
     IWeight act = null;
     float actDist = float.MaxValue;
     float temp;
@@ -62,7 +66,7 @@ public class Weight : InteractiveBase {
     // Items have priority
     if (act == null) {
       foreach (var player in GlobalList<PlayerController>.GetList) {
-        if (player.InteractiveBounds.Intersect(CylinderBounds, out temp)) {
+        if (player.interactiveBounds.Intersect(CylinderBounds, out temp)) {
           if (temp < actDist) {
             act = player;
             actDist = temp;
@@ -87,23 +91,37 @@ public class Weight : InteractiveBase {
       if (bevent) bevent.Interact(null, this);
     }
 
-    var ratio = fadeDuration / fadeTime;
-    var range = Mathf.Lerp(DeselectLightRange, SelectLightRange, ratio);
+  }
 
-    if (ShellMaterial)
-      ShellMaterial.color = Color.Lerp(DeselectColor, SelectShellColor, ratio);
-    if (FlowerMaterial)
-      FlowerMaterial.color = Color.Lerp(DeselectColor, SelectFlowerColor, ratio);
-    foreach (var l in CandleLights)
-      l.range = range;
+  private void Update() {
+    if (disabled){
+      transform.localScale = Vector3.Lerp(Vector3.zero, disabledscale, fadeDuration / disableTime);
+    } else {
+      var ratio = fadeDuration / fadeTime;
+      var range = Mathf.Lerp(DeselectLightRange, SelectLightRange, ratio);
+      if (ShellMaterial)
+        ShellMaterial.color = Color.Lerp(DeselectColor, SelectShellColor, ratio);
+      if (FlowerMaterial)
+        FlowerMaterial.color = Color.Lerp(DeselectColor, SelectFlowerColor, ratio);
+      foreach (var l in CandleLights)
+        l.range = range;
+    }
 
-    fadeDuration = Mathf.Clamp(fadeDuration + (selected ? Time.deltaTime : -Time.deltaTime), 0.0f, fadeTime);
+    fadeDuration = Mathf.Clamp(fadeDuration + (selected && !disabled ? Time.deltaTime : -Time.deltaTime), 0.0f, disabled ? disableTime : fadeTime);
 
+    if (disabled && fadeDuration == 0f) {
+      Destroy(gameObject);
+      transform.localScale = Vector3.zero;
+    }
   }
 
   public override void DisableEvents() {
     Destroy(bevent);
     bevent = null;
+
+    disabled = true;
+    disabledscale = transform.localScale;
+    fadeDuration = disableTime;
   }
 
 }

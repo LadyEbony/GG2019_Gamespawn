@@ -2,14 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class PlayerAbility : MonoBehaviour
-{
-  public InteractiveAbility Interactive { get; private set; }
-  public PlayerController Player { get; private set; }
+public abstract class PlayerAbility : MonoBehaviour {
+
+  /// <summary>
+  /// All player controllers have an interactive ability by default.
+  /// </summary>
+  public InteractiveAbility interactive { get; private set; }
+
+  /// <summary>
+  /// Player using this ability.
+  /// </summary>
+  public PlayerController player { get; private set; }
 
   public virtual void Awake(){
-    Interactive = GetComponentInParent<InteractiveAbility>();
-    Player = GetComponentInParent<PlayerController>();
+    interactive = GetComponentInParent<InteractiveAbility>();
+    player = GetComponentInParent<PlayerController>();
   }
 
   /// <summary>
@@ -19,7 +26,7 @@ public abstract class PlayerAbility : MonoBehaviour
   public virtual void UpdateSimulate(bool selected) { }
 
   /// <summary>
-  /// Buttion input simulator
+  /// Button input simulator
   /// </summary>
   /// <param name="pc"></param>
   public virtual void FixedSimulate(bool selected) { }

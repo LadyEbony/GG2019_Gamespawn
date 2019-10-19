@@ -4,6 +4,9 @@ using UnityEngine;
 
 using GameSpawn;
 
+/// <summary>
+/// Objects that can be selected by <see cref="InteractiveAbility"/>.
+/// </summary>
 public abstract class Interactive: InteractiveBase, IInteractive {
 
   public virtual void OnEnable() {

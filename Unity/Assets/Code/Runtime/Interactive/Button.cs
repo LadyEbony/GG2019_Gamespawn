@@ -20,6 +20,12 @@ public class Button : WallInteractive {
   [SerializeField] private float fadeTime = 0.25f;
   private float fadeDuration = 0.0f;
 
+  public override Vector3 CenterPosition {
+    get {
+      return OrbLight.transform.position;
+    }
+  }
+
   public override void Awake() {
     base.Awake();
 
@@ -57,6 +63,10 @@ public class Button : WallInteractive {
 
     if (disabled && fadeDuration == 0.0f){
       Destroy(this);
+      if (OrbMaterial)
+        OrbMaterial.color = DisabledColor;
+      if (OrbLight)
+        OrbLight.color = DisabledColor;
     }
   }
 

@@ -9,9 +9,12 @@ using Type = System.Type;
 public class InteractiveAbility : PlayerAbility {
 
   [Header("Interactive")]
-  [SerializeField] private Interactive focus;
+  [SerializeField] private Interactive _focus;
   [SerializeField] private CylinderTriggerBounds interactiveBounds;
-  public Interactive Focus { get { return focus; } }
+  /// <summary>
+  /// The interactive that the player has focused.
+  /// </summary>
+  public Interactive focus { get { return _focus; } private set { _focus = value; } }
 
 
   [Header("Interactive Types")]
@@ -43,8 +46,9 @@ public class InteractiveAbility : PlayerAbility {
   }
 
   public override void FixedSimulate(bool selected) {
-    var pc = Player;
+    var pc = player;
 
+    // If this player is no longer selected, automatically deselect
     if (!selected) {
       if (focus){
         focus.Deselect(pc);
@@ -59,6 +63,8 @@ public class InteractiveAbility : PlayerAbility {
     float actDist = float.MaxValue;
     float temp;
 
+    // Instead of doing collision-based checks based on their layer.
+    // We do the collison checks based on class.
     foreach (var type in interactTargets.Keys) {
       if (interactTargets[type] != 0) continue;
 
@@ -74,35 +80,53 @@ public class InteractiveAbility : PlayerAbility {
       }
     }
 
+    // Deselect if we found a new focus
     if (focus != null && focus != act){
       focus.Deselect(pc);  
     }
 
     focus = act;
 
+    // Select
     if (focus != null){
       focus.Select(pc);
     }
   }
 
+  /// <summary>
+  /// Disables interaction in the <see cref="Interactive"/>-based <paramref name="type"/> object.
+  /// </summary>
+  /// <param name="type"></param>
   public void DisableInteraction(Type type) {
     if (type.IsSubclassOf(typeof(Interactive))) {
       interactTargets[type] += 1;
     }
   }
 
+  /// <summary>
+  /// Disables interaction in the <see cref="Interactive"/>-based <paramref name="type"/> objects.
+  /// </summary>
+  /// <param name="types"></param>
   public void DisableInteraction(params Type[] types){
     foreach (var type in types) {
       DisableInteraction(type);
     }
   }
 
+  /// <summary>
+  /// Enables interaction in the <see cref="Interactive"/>-based <paramref name="type"/> object.
+  /// </summary>
+  /// <param name="type"></param>
   public void EnableInteraction(Type type) {
     if (type.IsSubclassOf(typeof(Interactive))) {
       interactTargets[type] -= 1;
     }
   }
 
+  /// <summary>
+  /// Enables interaction in the <see cref="Interactive"/>-based <paramref name="type"/> objects.
+  /// </summary>
+  /// <param name="types"></param>
   public void EnableInteraction(params Type[] types) {
     foreach (var type in types) {
       EnableInteraction(type);

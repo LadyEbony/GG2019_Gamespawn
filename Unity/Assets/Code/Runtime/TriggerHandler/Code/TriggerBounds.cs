@@ -5,22 +5,34 @@ using UnityEngine;
 namespace GameSpawn {
   public abstract class TriggerBounds : MonoBehaviour {
 
-    protected Vector3 transformPosition {
-      get {
-        return transform.position;
-      }
-    }
-    protected Vector3 transformScale {
-      get {
-        return transform.lossyScale;
-      }
-    }
+    // So the next question is why make our own collision checks.
+    // Cause I wanted the bounds to be binded to scripts instead of Unity's layer system.
+    // It is of course slower, but it's meant for small custom scripts.
 
-    public virtual bool Contains(Vector3 pos){ 
-      return false;
-    }
+    /// <summary>
+    /// Returns transform.position
+    /// </summary>
+    protected Vector3 transformPosition => transform.position;
 
-  public virtual bool Contains(Vector3 pos, out float sqrDistance) {
+    /// <summary>
+    /// Returns transform.lossyScale
+    /// </summary>
+    protected Vector3 transformScale => transform.lossyScale;
+
+    /// <summary>
+    /// Does bounds contain <paramref name="pos"/>.
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <returns></returns>
+    public virtual bool Contains(Vector3 pos) => false;
+
+    /// <summary>
+    /// Does bounds contain <paramref name="pos"/> and return <paramref name="sqrDistance"/>.
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <param name="sqrDistance"></param>
+    /// <returns></returns>
+    public virtual bool Contains(Vector3 pos, out float sqrDistance) {
       sqrDistance = float.MaxValue;
       return false;
     }

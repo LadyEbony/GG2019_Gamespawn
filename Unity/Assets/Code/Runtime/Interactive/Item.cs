@@ -12,6 +12,7 @@ public class Item : Interactive, IItem, IWeight {
   public Material MaterialInner { get; private set; }
   public ParticleSystem Particle { get; private set; }
 
+  // Special events that occur when the items are picked up
   private InteractiveEvent pickupEvent;
   private InteractiveEvent dropEvent;
 
@@ -79,6 +80,10 @@ public class Item : Interactive, IItem, IWeight {
     fadeDuration = Mathf.Clamp(fadeDuration + (selectedpc != null ? Time.deltaTime : -Time.deltaTime), 0.0f, fadeTime);
   }
 
+  /// <summary>
+  /// The <paramref name="pc"/> just picked up this item.
+  /// </summary>
+  /// <param name="pc"></param>
   public void Pickup(PlayerController pc){
     Rigidbody.velocity = Vector3.zero;
     Rigidbody.angularVelocity = Vector3.zero;
@@ -91,6 +96,10 @@ public class Item : Interactive, IItem, IWeight {
     if (bounce != null) StopCoroutine(bounce);
   }
 
+  /// <summary>
+  /// The <paramref name="pc"/> just dropped this item.
+  /// </summary>
+  /// <param name="pc"></param>
   public void Drop(PlayerController pc) {
     Rigidbody.velocity = Vector3.zero;
     Rigidbody.angularVelocity = Vector3.zero;

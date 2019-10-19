@@ -11,15 +11,11 @@ using TMPro;
 public class PlayerUI : MonoBehaviour {
 
   [Header("References")]
-  public TextMeshProUGUI mainText;
-  public Image mainBackdrop;
-  public GameObject selectionGameObject;
   private PlayerController mainPC;
 
   [Header("UI")]
-  private Vector3 positionMainBase;
-  private Vector3 positionOtherBase;
-  private Vector3 positionOtherOffset;
+  private Vector3 positionMain;
+  public float spacing = 200f;
   public float imageScale = 0.6f;
   public float transitionTime = 0.25f;
 
@@ -39,36 +35,33 @@ public class PlayerUI : MonoBehaviour {
   private List<SelectBundle> selections;
 
   private void Start() {
-    var selected = PlayerSwitch.instance.Selected;
-    var additional = GlobalList<PlayerController>.GetList.Where(s => s != selected);
+    var selected = PlayerSwitch.instance.selected;
 
-    mainPC = selected;
     selections = new List<SelectBundle>();
 
-    var selected_ts = selectionGameObject.transform;
-    var selected_im = selectionGameObject.GetComponent<Image>();
-    selected_im.sprite = selected.manager.Icon;
-    selections.Add(new SelectBundle(selected, selected_ts, selected_im));
-
-    mainText.text = selected.manager.CharacterName;
-    mainBackdrop.color = selected.manager.IconColor;
-
-    positionMainBase = selected_ts.position;
-    var width = Vector3.right * selectionGameObject.GetComponent<RectTransform>().rect.width;
-    positionOtherBase = positionMainBase +  width * (3 / 4f);
-    positionOtherOffset = width * imageScale;
+    var item = transform.GetChild(0).gameObject;
+    positionMain = item.transform.position;
 
     var i = 0;
-    foreach(var a in additional){
-      var temp = Instantiate(selectionGameObject, positionOtherBase + i * positionOtherOffset, Quaternion.identity, transform);
-      var temp_ts = temp.transform;
-      var temp_im = temp.GetComponent<Image>();
-      temp_ts.SetAsFirstSibling();
-      temp_ts.localScale = Vector3.one * imageScale;
-      temp_im.sprite = a.manager.Icon;
-      selections.Add(new SelectBundle(a, temp.transform, temp_im));
+    foreach(var p in GlobalList<PlayerController>.GetList){
+      var man = p.manager;
+
+      var temp = Instantiate(item, positionMain + new Vector3(i * spacing, 0f, 0f), Quaternion.identity, transform);
+      var t = temp.transform;
+      t.localScale = selected == p ? Vector3.one : Vector3.one * imageScale;
+
+      var image = t.Find("Logic").GetComponent<Image>();
+      image.sprite = man.Icon;
+
+      t.Find("Backdrop").GetComponent<Image>().color = man.IconColor;
+      t.Find("Text").GetComponent<TextMeshProUGUI>().text = man.CharacterName;
+
+      selections.Add(new SelectBundle(p, t, image));
+
       i++;
     }
+
+    item.SetActive(false);
 
   }
 
@@ -77,7 +70,7 @@ public class PlayerUI : MonoBehaviour {
       if (s.coroutine != null) StopCoroutine(s.coroutine);
     }
 
-    var selected = PlayerSwitch.instance.Selected;
+    var selected = PlayerSwitch.instance.selected;
     var count = selections.Count;
 
     SelectBundle first = selections[0];
@@ -90,14 +83,12 @@ public class PlayerUI : MonoBehaviour {
       }
     }
 
-    first.coroutine = StartCoroutine(UpdateIconCoroutine(first, positionMainBase, Vector3.one));
-    mainText.text = first.pc.manager.CharacterName;
-    mainBackdrop.color = first.pc.manager.IconColor;
+    first.coroutine = StartCoroutine(UpdateIconCoroutine(first, positionMain, Vector3.one));
 
     var j = 0;
     for(var i = (firstIndex + 1) % count; i != firstIndex; i = (i + 1) % count){
       first = selections[i];
-      first.coroutine = StartCoroutine(UpdateIconCoroutine(first, positionOtherBase + j * positionOtherOffset, Vector3.one * imageScale));
+      first.coroutine = StartCoroutine(UpdateIconCoroutine(first, positionMain + new Vector3(spacing * (j + 1), 0, 0), Vector3.one * imageScale));
       j++;
     }
 
@@ -122,7 +113,7 @@ public class PlayerUI : MonoBehaviour {
   }
 
   private void LateUpdate() {
-    var selected = PlayerSwitch.instance.Selected;
+    var selected = PlayerSwitch.instance.selected;
 
     if (mainPC != selected){
       mainPC = selected;

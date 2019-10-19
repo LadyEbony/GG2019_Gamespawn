@@ -9,37 +9,40 @@ namespace GameSpawn {
     public float radius = 0.5f;
     public float height = 2f;
 
+    /// <summary>
+    /// Returns transform.lossyScale(x,z) * radius
+    /// </summary>
     public float scaledRadius{
       get {
-        var s = transform.lossyScale;
+        var s = transformScale;
         return radius * Mathf.Max(s.x, s.z);
       }
     }
 
+    /// <summary>
+    /// Returns transform.lossyScale.y * height
+    /// </summary>
     public float scaledHeight{
       get {
-        var s = transform.lossyScale;
+        var s = transformScale;
         return height * s.y;
       }
     }
 
-    public Vector3 offsetCenter {
-      get {
-        return transformPosition + center;
-      }
-    }
+    /// <summary>
+    /// Returns transform.position + center
+    /// </summary>
+    public Vector3 offsetCenter => transformPosition + center;
 
-    public Vector3 offsetBottom {
-      get {
-        return transformPosition + center - new Vector3(0, scaledHeight / 2f, 0);
-      }
-    }
+    /// <summary>
+    /// Returns transform.position + bottom
+    /// </summary>
+    public Vector3 offsetBottom => offsetCenter - new Vector3(0, scaledHeight * 0.5f, 0);
 
-    public Vector3 offsetTop {
-      get {
-        return transformPosition + center + new Vector3(0, scaledHeight / 2f, 0);
-      }
-    }
+    /// <summary>
+    /// Returns transform.position + top
+    /// </summary>
+    public Vector3 offsetTop => offsetCenter - new Vector3(0, scaledHeight * 0.5f, 0);
 
     public override bool Contains(Vector3 pos) {
       throw new System.NotImplementedException();
@@ -49,13 +52,9 @@ namespace GameSpawn {
       throw new System.NotImplementedException();
     }
 
-    public override bool Intersect(CylinderTriggerBounds bounds, out float sqrDistance) {
-      return BoundCollider.Intersect(this, bounds, out sqrDistance);
-    }
+    public override bool Intersect(CylinderTriggerBounds bounds, out float sqrDistance) => BoundCollider.Intersect(this, bounds, out sqrDistance);
 
-    public override bool Intersect(SphereTriggerBounds bounds, out float sqrDistance) {
-      return BoundCollider.Intersect(this, bounds, out sqrDistance);
-    }
+    public override bool Intersect(SphereTriggerBounds bounds, out float sqrDistance) => BoundCollider.Intersect(this, bounds, out sqrDistance);
 
     public override void OnDrawGizmosSelected() {
       Gizmos.color = Color.green;

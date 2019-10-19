@@ -7,6 +7,8 @@ TagManager:
   - Emission
   - Main Material
   - Main UI
+  - Teleport
+  - Exit
   layers:
   - Default
   - TransparentFX

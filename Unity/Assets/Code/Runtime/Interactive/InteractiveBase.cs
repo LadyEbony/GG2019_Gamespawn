@@ -13,6 +13,12 @@ public abstract class InteractiveBase : MonoBehaviour
   public CylinderTriggerBounds CylinderBounds { get; private set; }
   public SphereTriggerBounds SphereBounds { get; private set; }
 
+  public virtual Vector3 CenterPosition {
+    get {
+      return transform.position;
+    }
+  }
+
   public virtual void Awake(){
     MeshRenderer = GetComponent<MeshRenderer>();
     if (MeshRenderer) Material = MeshRenderer.material;

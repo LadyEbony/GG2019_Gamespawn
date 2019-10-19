@@ -12,13 +12,9 @@ public class CameraFollow : MonoBehaviour
   }
 
   private void LateUpdate() {
-    var player = PlayerSwitch.instance.Selected;
+    var player = PlayerSwitch.instance.selected;
     if (player){
-      var ppos = player.transform.position;
-      ppos.y = t.position.y;
-
-      t.position = Vector3.Lerp(t.position, ppos, LerpAmount * Time.deltaTime);
-
+      t.position = Vector3.Lerp(t.position, player.headTransform.position, LerpAmount * Time.deltaTime);
     }
   }
 }

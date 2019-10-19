@@ -26,7 +26,7 @@ public class TutorialZone : MonoBehaviour
     var selected = false;
     float sqrdist;
     foreach(var player in GlobalList<PlayerController>.GetList){
-      if (Bounds.Intersect(player.InteractiveBounds, out sqrdist)){
+      if (Bounds.Intersect(player.interactiveBounds, out sqrdist)){
         selected = true;
         once = true;
         break;
