@@ -211,7 +211,7 @@ public class ItemAbility : PlayerAbility {
   private void Throw(PlayerController pc) {
     var direction = pc.transform.rotation * Vector3.forward;
     var item = ItemHolder.Has(this);
-    item.Rigidbody.AddForce(direction * throwForce, ForceMode.Impulse);
+    item.rigidbody.AddForce(direction * throwForce, ForceMode.Impulse);
 
     Drop(pc);
   }

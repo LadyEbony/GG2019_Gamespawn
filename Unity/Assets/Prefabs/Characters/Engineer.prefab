@@ -658,7 +658,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CharacterName: Maribel
   Icon: {fileID: 21300000, guid: f08622c7ff68931439cb5e6199c508ac, type: 3}
-  IconColor: {r: 0.6484864, g: 0, b: 0, a: 1}
+  IconColor: {r: 0.64705884, g: 0, b: 0.6261184, a: 1}
 --- !u!114 &1203044397895659284
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -671,14 +671,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60f6da4279e3de849a41f647c7087194, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MouseOveride: {fileID: 0}
-  SprintMultiplier: 1.5
-  DisableInput: 0
-  DisableMovement: 0
-  DisableRotation: 0
-  DisableSwitch: 0
-  disableNavMesh: 0
-  disableRenderer: 0
+  mouseOveride: {fileID: 0}
+  sprintModifier: 1.5
+  disableMovement: 0
+  disableRotation: 0
+  _disableNavMesh: 0
+  _disableRenderer: 0
 --- !u!114 &144612870643117038
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -909,7 +907,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ff1f997f1f79d348826fb1a33030f42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  focus: {fileID: 0}
+  _focus: {fileID: 0}
   interactiveBounds: {fileID: 3355276424555970996}
 --- !u!1 &3644287385760705305
 GameObject:

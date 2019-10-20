@@ -7,10 +7,10 @@ using UnityEngine.AI;
 
 public class Item : Interactive, IItem, IWeight {
   
-  public Rigidbody Rigidbody { get; private set; }
+  public new Rigidbody rigidbody { get; private set; }
 
-  public Material MaterialInner { get; private set; }
-  public ParticleSystem Particle { get; private set; }
+  public Material materialInner { get; private set; }
+  public ParticleSystem particleSystem { get; private set; }
 
   // Special events that occur when the items are picked up
   private InteractiveEvent pickupEvent;
@@ -21,25 +21,25 @@ public class Item : Interactive, IItem, IWeight {
   private Color selectedcolor;
 
   [Header("Selection")]
-  [SerializeField] private Color StandardColor = new Color(1, 1, 1);
-  [SerializeField] private Color WeightedColor = new Color(1, 1, 1);
-  [SerializeField] private float fadeTime = 0.25f;
+  public Color standardColor = new Color(1, 1, 1);
+  public Color weightedColor = new Color(1, 1, 1);
+  public float fadeTime = 0.25f;
   private float fadeDuration = 0.0f;
 
   [Header("Bounce")]
-  [SerializeField] private float bounceTime = 0.25f;
-  [SerializeField] private float bounceHeight = 0.5f;
+  public float bounceTime = 0.25f;
+  public float bounceHeight = 0.5f;
 
   public override void Awake() {
     base.Awake();
 
-    Rigidbody = GetComponent<Rigidbody>();
+    rigidbody = GetComponent<Rigidbody>();
 
     var mesht = transform.Find("Inner");
     if (mesht) {
-      MaterialInner = mesht.GetComponent<MeshRenderer>().material;
+      materialInner = mesht.GetComponent<MeshRenderer>().material;
     }
-    Particle = GetComponentInChildren<ParticleSystem>(true);
+    particleSystem = GetComponentInChildren<ParticleSystem>(true);
 
     var events = GetComponents<InteractiveEvent>();
     if (events.Length >= 1) pickupEvent = events[0];
@@ -49,25 +49,25 @@ public class Item : Interactive, IItem, IWeight {
   private void Update() {
     // Box color
     if (weighted){
-      MaterialInner.color = WeightedColor;
+      materialInner.color = weightedColor;
     } else {
-      MaterialInner.color = StandardColor;
+      materialInner.color = standardColor;
     }
 
     // Selection particles
-    if (Particle) {
+    if (particleSystem) {
       var pcolor = Color.Lerp(Color.clear, selectedcolor, fadeDuration / fadeTime);
 
       var particles = new ParticleSystem.Particle[12];
-      var particlesize = Particle.GetParticles(particles);
+      var particlesize = particleSystem.GetParticles(particles);
       
       for(var i = 0; i < particlesize; i++){
         particles[i].startColor = pcolor;
       }
 
-      Particle.SetParticles(particles, particlesize);
+      particleSystem.SetParticles(particles, particlesize);
 
-      var pmain = Particle.main;
+      var pmain = particleSystem.main;
       pmain.startColor = pcolor;
 
     }
@@ -85,9 +85,9 @@ public class Item : Interactive, IItem, IWeight {
   /// </summary>
   /// <param name="pc"></param>
   public void Pickup(PlayerController pc){
-    Rigidbody.velocity = Vector3.zero;
-    Rigidbody.angularVelocity = Vector3.zero;
-    Rigidbody.useGravity = false;
+    rigidbody.velocity = Vector3.zero;
+    rigidbody.angularVelocity = Vector3.zero;
+    rigidbody.useGravity = false;
 
     gameObject.layer = LayerMask.NameToLayer("ItemPickup");
 
@@ -101,9 +101,9 @@ public class Item : Interactive, IItem, IWeight {
   /// </summary>
   /// <param name="pc"></param>
   public void Drop(PlayerController pc) {
-    Rigidbody.velocity = Vector3.zero;
-    Rigidbody.angularVelocity = Vector3.zero;
-    Rigidbody.useGravity = true;
+    rigidbody.velocity = Vector3.zero;
+    rigidbody.angularVelocity = Vector3.zero;
+    rigidbody.useGravity = true;
 
     gameObject.layer = LayerMask.NameToLayer("Item");
 
@@ -138,11 +138,11 @@ public class Item : Interactive, IItem, IWeight {
   }
 
   private IEnumerator BounceCoroutine(Vector3 destination) {
-    Rigidbody.isKinematic = true;
-    Rigidbody.detectCollisions = false;
-    Rigidbody.velocity = Vector3.zero;
-    Rigidbody.angularVelocity = Vector3.zero;
-    Rigidbody.useGravity = false;
+    rigidbody.isKinematic = true;
+    rigidbody.detectCollisions = false;
+    rigidbody.velocity = Vector3.zero;
+    rigidbody.angularVelocity = Vector3.zero;
+    rigidbody.useGravity = false;
 
     gameObject.layer = LayerMask.NameToLayer("ItemPickup");
 
@@ -161,9 +161,9 @@ public class Item : Interactive, IItem, IWeight {
     transform.position = destination;
     transform.rotation = finalrotation;
 
-    Rigidbody.isKinematic = false;
-    Rigidbody.detectCollisions = true;
-    Rigidbody.useGravity = true;
+    rigidbody.isKinematic = false;
+    rigidbody.detectCollisions = true;
+    rigidbody.useGravity = true;
     gameObject.layer = LayerMask.NameToLayer("Item");
 
     bounce = null;

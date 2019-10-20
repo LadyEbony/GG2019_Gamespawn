@@ -59,6 +59,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -78,7 +79,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1882474521324336178}
-  m_Mesh: {fileID: 4300000, guid: 2280bd947a482d74189b9fa0cd2ecbad, type: 3}
+  m_Mesh: {fileID: 9080492663175861902, guid: 19eba9123914f724193883ed4f8a35d8, type: 3}
 --- !u!65 &1010691509743220419
 BoxCollider:
   m_ObjectHideFlags: 0

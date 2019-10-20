@@ -1,32 +1,8 @@
 fileFormatVersion: 2
-guid: f896276aeb323b34d8bf2f587e983b4e
+guid: 6f20ad961fd8c3e43887cde61216cad5
 ModelImporter:
-  serializedVersion: 23
-  fileIDToRecycleName:
-    100000: //RootNode
-    100002: Door_Frame_0
-    100004: Door_Frame_1
-    100006: Door_Frame_Model_0
-    100008: Door_Frame_Model_1
-    400000: //RootNode
-    400002: Door_Frame_0
-    400004: Door_Frame_1
-    400006: Door_Frame_Model_0
-    400008: Door_Frame_Model_1
-    2100000: Wall
-    2100002: Ceiling
-    2300000: Door_Frame_0
-    2300002: Door_Frame_1
-    2300004: Door_Frame_Model_0
-    2300006: Door_Frame_Model_1
-    3300000: Door_Frame_0
-    3300002: Door_Frame_1
-    3300004: Door_Frame_Model_0
-    3300006: Door_Frame_Model_1
-    4300000: Door_Frame_0
-    4300002: Door_Frame_1
-    4300004: Door_Frame_Model_0
-    4300006: Door_Frame_Model_1
+  serializedVersion: 26
+  internalIDToNameTable: []
   externalObjects: {}
   materials:
     importMaterials: 1
@@ -55,13 +31,14 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 1
+    isReadable: 0
   meshes:
     lODScreenPercentages: []
     globalScale: 1
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1
@@ -69,18 +46,19 @@ ModelImporter:
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
-    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
     preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
     useFileScale: 1
-    previousCalculatedGlobalScale: 1
-    hasPreviousCalculatedGlobalScale: 0
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
@@ -89,10 +67,11 @@ ModelImporter:
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
+  referencedClips: []
   importAnimation: 1
   copyAvatar: 0
   humanDescription:
-    serializedVersion: 2
+    serializedVersion: 3
     human: []
     skeleton: []
     armTwist: 0.5
@@ -102,6 +81,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
+    globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0
