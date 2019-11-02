@@ -15,10 +15,107 @@ MonoBehaviour:
   version: 1.0
   length: 24
   width: 24
-  height: 3
-  cellsize: 1
-  cells: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000111101000000000000000000000000000000000000000000000000000000000000000000000000000010010000000000000000444414010000000000000000444414010000000000220200444414010000000000220200444414010000000000000000444414010011111111000000444414010011111111000000444414010000000000000000444414010000000000000000444414010000000000000000000010010000000000222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
+  height: 4
+  cellsize: 2
+  cells: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000404444444444440400111101400400000000000000000000400400000000000000000000400400000000000000000000400410000000000000000000444414000000000000000000444414000000000000220200444414010000000000220200444414010000000000000000444414010011111111000000444414010011111111000000444414010000000000000000444414010000000000000000444414010000000000000000000010010000000000222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
   display: 0
+  details:
+  - cell: 0
+    layer: 10
+    areaType: 0
+    colliderCreate: 1
+    colliderHeightUseMapHeight: 0
+    colliderHeight: 0.1
+    colliderOffset: -0.1
+    groundMaterial: {fileID: 2100000, guid: 3a85228786dda964cad9187ddcbd03a3, type: 2}
+    groundUseMapHeight: 0
+    groundOffset: 0
+    wallCreate: 0
+    wallInvert: 0
+    wallUseMapHeight: 1
+    wallMaterial: {fileID: 2100000, guid: 30f8b9f19b3511245b812ba490828b21, type: 2}
+    wallOffset: 0
+    wallHeight: 0
+  - cell: 1
+    layer: 11
+    areaType: 1
+    colliderCreate: 1
+    colliderHeightUseMapHeight: 1
+    colliderHeight: 0
+    colliderOffset: 0
+    groundMaterial: {fileID: 2100000, guid: 88d0b43be1a382347a7cb5a556c84a2f, type: 2}
+    groundUseMapHeight: 1
+    groundOffset: 0
+    wallCreate: 1
+    wallInvert: 0
+    wallUseMapHeight: 1
+    wallMaterial: {fileID: 2100000, guid: 30f8b9f19b3511245b812ba490828b21, type: 2}
+    wallOffset: 0
+    wallHeight: 0
+  - cell: 2
+    layer: 0
+    areaType: 1
+    colliderCreate: 0
+    colliderHeightUseMapHeight: 0
+    colliderHeight: 0
+    colliderOffset: 0
+    groundMaterial: {fileID: 2100000, guid: a9b45cd97b8d5c64da839b63544e443d, type: 2}
+    groundUseMapHeight: 0
+    groundOffset: 0
+    wallCreate: 0
+    wallInvert: 0
+    wallUseMapHeight: 0
+    wallMaterial: {fileID: 0}
+    wallOffset: 0
+    wallHeight: 0
+  - cell: 3
+    layer: 0
+    areaType: 0
+    colliderCreate: 0
+    colliderHeightUseMapHeight: 0
+    colliderHeight: 0
+    colliderOffset: 0
+    groundMaterial: {fileID: 0}
+    groundUseMapHeight: 0
+    groundOffset: 0
+    wallCreate: 0
+    wallInvert: 0
+    wallUseMapHeight: 0
+    wallMaterial: {fileID: 0}
+    wallOffset: 0
+    wallHeight: 0
+  - cell: 4
+    layer: 0
+    areaType: 1
+    colliderCreate: 0
+    colliderHeightUseMapHeight: 0
+    colliderHeight: 0
+    colliderOffset: 0
+    groundMaterial: {fileID: 2100000, guid: 182ec4936a68bdf42a0e8f79312f4045, type: 2}
+    groundUseMapHeight: 0
+    groundOffset: -1
+    wallCreate: 1
+    wallInvert: 1
+    wallUseMapHeight: 0
+    wallMaterial: {fileID: 2100000, guid: 182ec4936a68bdf42a0e8f79312f4045, type: 2}
+    wallOffset: -1
+    wallHeight: 1
+  - cell: 5
+    layer: 0
+    areaType: 0
+    colliderCreate: 0
+    colliderHeightUseMapHeight: 0
+    colliderHeight: 0
+    colliderOffset: 0
+    groundMaterial: {fileID: 0}
+    groundUseMapHeight: 0
+    groundOffset: 0
+    wallCreate: 0
+    wallInvert: 0
+    wallUseMapHeight: 0
+    wallMaterial: {fileID: 0}
+    wallOffset: 0
+    wallHeight: 0
   baseGroundGameobject: {fileID: 2544914064428682688, guid: 9c0bb7d0e5a5e374ba990f76f973df1c,
     type: 3}
   baseWallGameobject: {fileID: 5548279939260946018, guid: ca7078cd0ab007644a89408083e2cbf8,

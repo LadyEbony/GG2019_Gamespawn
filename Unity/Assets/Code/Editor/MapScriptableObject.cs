@@ -16,7 +16,30 @@ public struct MapVector {
   }
 }
 
-public class MapScriptableObject : ScriptableObject {
+[System.Serializable]
+public class MapTileDetails {
+  public MapScriptableObject.CellType cell;
+  public int layer;
+  public int areaType;
+
+  public bool colliderCreate;
+  public bool colliderHeightUseMapHeight;
+  public float colliderHeight;
+  public float colliderOffset;
+
+  public Material groundMaterial;
+  public bool groundUseMapHeight;
+  public float groundOffset;
+
+  public bool wallCreate;
+  public bool wallInvert;
+  public bool wallUseMapHeight;
+  public Material wallMaterial;
+  public float wallOffset;
+  public float wallHeight;
+}
+
+  public class MapScriptableObject : ScriptableObject {
 
   public string version = "1.0";
   public const string CURRENT_VERSION = "1.1";
@@ -38,6 +61,8 @@ public class MapScriptableObject : ScriptableObject {
 
   public int[] cells;
   public bool display = true;
+
+  public MapTileDetails[] details;
 
   public GameObject baseGroundGameobject;
   public GameObject baseWallGameobject;
