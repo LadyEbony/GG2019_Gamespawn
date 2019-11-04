@@ -34,6 +34,7 @@ public class MapTileDetails {
   public bool wallCreate;
   public bool wallInvert;
   public bool wallUseMapHeight;
+  public bool wallScaleUVHeight;
   public Material wallMaterial;
   public float wallOffset;
   public float wallHeight;

@@ -160,6 +160,7 @@ public class MapEditorWindow : EditorWindow {
       item.wallMaterial = (Material)EditorGUILayout.ObjectField("Wall Material", item.wallMaterial, typeof(Material), false);
       item.wallOffset = EditorGUILayout.FloatField("Wall Offset", item.wallOffset);
       item.wallHeight = EditorGUILayout.FloatField("Wall Height", item.wallHeight);
+      item.wallScaleUVHeight = EditorGUILayout.Toggle("Scale UV Height?", item.wallScaleUVHeight);
       item.wallInvert = EditorGUILayout.Toggle("Invert?", item.wallInvert);
       EditorGUI.indentLevel--;
     }
@@ -170,7 +171,7 @@ public class MapEditorWindow : EditorWindow {
     if (GUILayout.Button("Copy", standardButton)){
       savedDetails = instance.details;
     }
-    var copyState = savedDetails != null & savedDetails.Length > 0;
+    var copyState = savedDetails != null && savedDetails.Length > 0;
     if (GUILayout.Button("Paste", copyState ? standardButton : disabledButton) && copyState){
       instance.details = savedDetails;
     }
@@ -722,6 +723,7 @@ public class MapEditorWindow : EditorWindow {
     var safety = 10;
 
     var state = invert ? true : false;
+    var toggle = true;
     var pValue = 1;
 
     // get path
@@ -760,8 +762,11 @@ public class MapEditorWindow : EditorWindow {
         current = next;
       } while (first != current);
 
-      state = !state;
-      pValue = (pValue + 2) % 4;
+      if (toggle) {
+        state = !state;
+        pValue = (pValue + 2) % 4;
+        toggle = false;
+      }
 
       safety--;
       if (safety < 0){
@@ -882,6 +887,7 @@ public class MapEditorWindow : EditorWindow {
     var bottomHeight = details.wallOffset;
     var totalHeight = details.wallHeight + (details.wallUseMapHeight ? instance.height : 0f);
     var topHeight = bottomHeight + totalHeight;
+    var topUV = details.wallScaleUVHeight ? totalHeight : 1f;
 
     // get position and vertex first
     foreach (var b in boxes) {
@@ -907,7 +913,7 @@ public class MapEditorWindow : EditorWindow {
         var corner = corners[i];
         var index = corner.index;
 
-        corner.uv = CornerToWallNormalPosition(distance + (i % 2 == 1 ? d : 0f), i >= 2 ? totalHeight : 0f);
+        corner.uv = CornerToWallNormalPosition(distance + (i % 2 == 1 ? d : 0f), i >= 2 ? topUV : 0f);
       }
       distance += d;
     }
