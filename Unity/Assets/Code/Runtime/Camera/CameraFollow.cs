@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-  public float LerpAmount = 0.1f;
+  public float lerpAmount = 3f;
+  public float distance = 10f;
   private Transform t;
 
   private void Awake() {
@@ -14,7 +15,9 @@ public class CameraFollow : MonoBehaviour
   private void LateUpdate() {
     var player = PlayerSwitch.instance.selected;
     if (player){
-      t.position = Vector3.Lerp(t.position, player.headTransform.position, LerpAmount * Time.deltaTime);
+      var start = t.position;
+      var dest = player.transform.position - t.forward * distance;
+      t.position = Vector3.Lerp(start, dest, lerpAmount * Time.deltaTime);
     }
   }
 }

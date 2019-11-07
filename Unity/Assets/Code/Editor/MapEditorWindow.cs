@@ -8,6 +8,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 public class MapEditorWindow : EditorWindow {
   [MenuItem("Window/Map")]
@@ -48,11 +49,21 @@ public class MapEditorWindow : EditorWindow {
     "TL", "TC", "TR", "ML", "MC", "MR", "BL", "BM", "BR"
   };
 
+  private static readonly MapScriptableObject.CellType[] tileOptions = new[]{
+    MapScriptableObject.CellType.Ground,
+    MapScriptableObject.CellType.Wall,
+    MapScriptableObject.CellType.Pitfall,
+    MapScriptableObject.CellType.Empty,
+    MapScriptableObject.CellType.GroundAlt,
+    MapScriptableObject.CellType.WallAlt
+  };
+
   // Remembering pre-show-map state
   private bool onView;
   private bool previousOrtho;
   private MapScriptableObject.CellType selectedCellType = MapScriptableObject.CellType.Wall;
-  private MapTileDetails[] savedDetails;
+
+  private MapTileDetails[] savedDetailsAll;
 
   /// <summary>
   /// Editor Window
@@ -116,7 +127,7 @@ public class MapEditorWindow : EditorWindow {
     // Paint buttons
     EditorGUILayout.BeginHorizontal();
     var i = 0;
-    foreach (MapScriptableObject.CellType cellvalue in System.Enum.GetValues(typeof(MapScriptableObject.CellType))) {
+    foreach (var cellvalue in tileOptions) {
       if (GUILayout.Button(cellvalue.ToString(), selectedCellType == cellvalue ? pressedButton : standardButton)) {
         selectedCellType = cellvalue;
       }
@@ -131,27 +142,32 @@ public class MapEditorWindow : EditorWindow {
 
     // Show options for whichever is selected
     var item = details[(int)selectedCellType];
+    item.inactiveColor = EditorGUILayout.ColorField("Inactive Color", item.inactiveColor);
+    item.activeColor = EditorGUILayout.ColorField("Active Color", item.activeColor);
     item.layer = EditorGUILayout.LayerField("Layer", item.layer);
     item.areaType = EditorGUILayout.Popup("Area Type", item.areaType, GameObjectUtility.GetNavMeshAreaNames());
 
     EditorGUILayout.Space();
 
+    item.groundCreate = EditorGUILayout.Toggle("Create Ground?", item.groundCreate);
+    if (item.groundCreate) {
+      EditorGUI.indentLevel++;
+      item.groundMaterial = (Material)EditorGUILayout.ObjectField("Ground Material", item.groundMaterial, typeof(Material), false);
+      item.groundUseMapHeight = EditorGUILayout.Toggle("Use Height?", item.groundUseMapHeight);
+      item.groundOffset = EditorGUILayout.FloatField("Ground Offset", item.groundOffset);
+      EditorGUI.indentLevel--;
+      EditorGUILayout.Space();
+    }
+
     item.colliderCreate = EditorGUILayout.Toggle("Create Colliders?", item.colliderCreate);
-    if (item.colliderCreate){
+    if (item.colliderCreate) {
       EditorGUI.indentLevel++;
       item.colliderHeightUseMapHeight = EditorGUILayout.Toggle("Use Height?", item.colliderHeightUseMapHeight);
       item.colliderHeight = EditorGUILayout.FloatField("Collider Height", item.colliderHeight);
       item.colliderOffset = EditorGUILayout.FloatField("Collider Offset", item.colliderOffset);
       EditorGUI.indentLevel--;
+      EditorGUILayout.Space();
     }
-
-    EditorGUILayout.Space();
-
-    item.groundMaterial = (Material)EditorGUILayout.ObjectField("Ground Material", item.groundMaterial, typeof(Material), false);
-    item.groundUseMapHeight = EditorGUILayout.Toggle("Use Height?", item.groundUseMapHeight);
-    item.groundOffset = EditorGUILayout.FloatField("Ground Offset", item.groundOffset);
-
-    EditorGUILayout.Space();
 
     item.wallCreate = EditorGUILayout.Toggle("Create Walls?", item.wallCreate);
     if (item.wallCreate) {
@@ -163,17 +179,21 @@ public class MapEditorWindow : EditorWindow {
       item.wallScaleUVHeight = EditorGUILayout.Toggle("Scale UV Height?", item.wallScaleUVHeight);
       item.wallInvert = EditorGUILayout.Toggle("Invert?", item.wallInvert);
       EditorGUI.indentLevel--;
+      EditorGUILayout.Space();
     }
+
+    item.mapUniqueCreate = EditorGUILayout.Toggle("Store in Map_Unique?", item.mapUniqueCreate);
 
     // Copy and paste
     EditorGUILayout.Separator();
+
     EditorGUILayout.BeginHorizontal();
-    if (GUILayout.Button("Copy", standardButton)){
-      savedDetails = instance.details;
+    if (GUILayout.Button("Copy All", standardButton)) {
+      savedDetailsAll = instance.details;
     }
-    var copyState = savedDetails != null && savedDetails.Length > 0;
-    if (GUILayout.Button("Paste", copyState ? standardButton : disabledButton) && copyState){
-      instance.details = savedDetails;
+    var copyState = savedDetailsAll != null && savedDetailsAll.Length > 0;
+    if (GUILayout.Button("Paste All", copyState ? standardButton : disabledButton) && copyState) {
+      instance.details = savedDetailsAll;
     }
     EditorGUILayout.EndHorizontal();
 
@@ -296,14 +316,14 @@ public class MapEditorWindow : EditorWindow {
 
     // Main draw
     for (var i = 0; i < instance.GetSize(); i++) {
-      faceColor = instance.GetCellColor(instance.GetCellValue(i));
+      faceColor = instance.details[instance.GetCellValue(i)].inactiveColor;
       DrawSolidRectangle(instance.GetMapPosition(i), left, bot, cell, faceColor);
     }
 
     // Box draw
     if (dragActiveBox) {
+      faceColor = instance.details[dragSetState].activeColor;
       foreach (var m in instance.GetRegion(dragStartIndex, dragEndIndex)) {
-        faceColor = instance.GetCellDragColor(dragSetState);
         DrawSolidRectangle(m, left, bot, cell, faceColor);
       }
     }
@@ -504,26 +524,44 @@ public class MapEditorWindow : EditorWindow {
 
   private void CreateMap() {
     // Create map gameobject
-    var map = GameObject.Find("Map_Generate");
-    Transform mapParent = null;
-    if (map) {
-      mapParent = map.transform.parent;
-      DestroyImmediate(map);
+    Transform mainParent = null;
+
+    var generate = GameObject.Find("Map_Generate");
+    var unique = GameObject.Find("Map_Unique");
+
+    Transform generateTransform = null;
+    Transform uniqueTransform = null;
+
+    if (generate) {
+      mainParent = generate.transform.parent;
+      DestroyImmediate(generate);
     }
 
-    map = new GameObject("Map_Generate");
-    if (mapParent) map.transform.SetParent(mapParent);
-    mapParent = map.transform;
+    generate = new GameObject("Map_Generate");
+    generateTransform = generate.transform;
+    if (mainParent) generateTransform.SetParent(mainParent);
 
-    var cells = new[] { MapScriptableObject.CellType.Ground, MapScriptableObject.CellType.Wall, MapScriptableObject.CellType.Pitfall };
-    foreach (var cell in cells){
-      CreateMesh(mapParent, instance.details.First(d => d.cell == cell), cell);
+    if (unique){
+      uniqueTransform = unique.transform;
+      if (mainParent) uniqueTransform.SetParent(mainParent);
+      else mainParent = uniqueTransform.parent;
+    } else {
+      unique = new GameObject("Map_Unique");
+      uniqueTransform = unique.transform;
+      if (mainParent) uniqueTransform.SetParent(mainParent);
+    }
+    
+    foreach (var cell in tileOptions){
+      var details = instance.details[(int)cell];
+      CreateMesh(details.mapUniqueCreate ? uniqueTransform : generateTransform, details, cell);
     }
 
     EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
   }
 
   private void CreateMesh(Transform parent, MapTileDetails details, MapScriptableObject.CellType cellType) {
+    if (!details.groundCreate && !details.wallCreate && !details.colliderCreate) return;
+
     System.Func<int, bool> compareFunc = (i) => instance.GetCellType(i, (int)cellType);
     HashSet<int> free = new HashSet<int>();
 
@@ -544,12 +582,17 @@ public class MapEditorWindow : EditorWindow {
       if (free.Contains(freeIndex)) {
 
         var tiles = GetNeighboringTiles(freeIndex, free, compareFunc);
-        var boxes = GetGroundBoxes(tiles);
-        var vertexCount = AdjustGroundBoxes(boxes, details, 0);
-
         var mesh = new Mesh();
-        AddVertices(mesh, boxes);
-        BuildMainMesh(mesh, boxes, 0);
+        var boxes = new List<Box>();
+        var vertexCount = 0;
+
+        if (details.groundCreate){
+          boxes = GetGroundBoxes(tiles);
+          vertexCount = AdjustGroundBoxes(boxes, details, 0);
+
+          AddVertices(mesh, boxes);
+          BuildMainMesh(mesh, boxes, 0);
+        }
 
         if (details.wallCreate) {
           var wallboxes = GetWallBoxes(tiles, details.wallInvert);
@@ -566,7 +609,11 @@ public class MapEditorWindow : EditorWindow {
 
         gotransform.parent = parent;
 
-        go.GetComponent<MeshRenderer>().sharedMaterials = new Material[] { details.groundMaterial, details.wallMaterial };
+        var mats = new List<Material>();
+        if (details.groundCreate) mats.Add(details.groundMaterial);
+        if (details.wallCreate) mats.Add(details.wallMaterial);
+
+        go.GetComponent<MeshRenderer>().sharedMaterials = mats.ToArray();
         go.GetComponent<MeshFilter>().sharedMesh = mesh;
 
         if (details.colliderCreate) {
@@ -594,32 +641,15 @@ public class MapEditorWindow : EditorWindow {
             ai.area = details.areaType;
           }
         }
-
-        /*
-
-         // create mesh
-         var mesh = new Mesh();
-         var vertices = new List<Vector3>();
-         var triangles = new List<int>();
-
-         var cKeys = corners.Keys;
-         foreach (var c in cKeys) {
-           vertices.Add(new Vector3(c % clength, 0f, c / clength));
-         }
-
-         mesh.SetVertices(vertices);
-         mesh.SetTriangles()
-
-         // create gameobject
-         var go = Instantiate(gameObject);
-         var transform = go.transform;
-
-         transform.parent = parent;
-
-         transform.GetComponent<MeshFilter>().sharedMesh = mesh;
-         */
       }
     }
+
+    if (details.mapUniqueCreate) {
+      foreach (var f in freekeys) {
+        instance.SetCellType(f, (int)MapScriptableObject.CellType.Empty);
+      }
+    }
+
 
   }
 
@@ -966,4 +996,5 @@ public class MapEditorWindow : EditorWindow {
   }
 
   #endregion
+
 }

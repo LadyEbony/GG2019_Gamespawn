@@ -71,7 +71,7 @@ public class InteractiveAbility : PlayerAbility {
       list = GlobalTypeList<Interactive>.GetTypeList(type);
       if (list == null) continue;
       foreach(var entity in list){
-        if (entity.Bounds.Intersect(interactiveBounds, out temp)) {
+        if (entity.IsPlayerInteractable && entity.Bounds.Intersect(interactiveBounds, out temp)) {
           if (temp < actDist) {
             act = entity;
             actDist = temp;

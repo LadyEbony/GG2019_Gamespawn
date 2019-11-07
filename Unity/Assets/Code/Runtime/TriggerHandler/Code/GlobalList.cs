@@ -101,7 +101,7 @@ namespace GameSpawn {
     /// </summary>
     public static IReadOnlyCollection<T> GetTypeList(Type type) {
       List<T> value;
-      return typeDictionary.TryGetValue(type, out value) ? value : null;
+      return typeDictionary.TryGetValue(type, out value) ? value : new List<T>();
     }
 
     /// <summary>

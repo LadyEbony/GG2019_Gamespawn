@@ -21,7 +21,7 @@ MonoBehaviour:
   - cutscene: {fileID: 0}
     selected: 0
   - cutscene: {fileID: 11400000, guid: 626834ede7bdb6d41a3d1ef86964085d, type: 2}
-    selected: 1
+    selected: 0
   - cutscene: {fileID: 0}
     selected: 0
   - cutscene: {fileID: 0}

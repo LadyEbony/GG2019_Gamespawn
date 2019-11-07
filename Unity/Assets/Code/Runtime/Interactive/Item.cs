@@ -10,7 +10,7 @@ public class Item : Interactive, IItem, IWeight {
   public new Rigidbody rigidbody { get; private set; }
 
   public Material materialInner { get; private set; }
-  public ParticleSystem particleSystem { get; private set; }
+  public new ParticleSystem particleSystem { get; private set; }
 
   // Special events that occur when the items are picked up
   private InteractiveEvent pickupEvent;
@@ -127,6 +127,20 @@ public class Item : Interactive, IItem, IWeight {
 
   public void Exit(Weight weight) {
     weighted = false;
+  }
+
+  public void EnableInteraction(){
+    if (disablePlayer == 0){
+      gameObject.layer = LayerMask.NameToLayer("ItemPickup");
+    }
+    disablePlayer++;
+  }
+
+  public void DisableInteraction(){
+    disablePlayer--;
+    if (disablePlayer == 0){
+      gameObject.layer = LayerMask.NameToLayer("Item");
+    }
   }
 
   private Coroutine bounce;

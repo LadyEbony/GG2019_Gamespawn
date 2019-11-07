@@ -19,6 +19,8 @@ public struct MapVector {
 [System.Serializable]
 public class MapTileDetails {
   public MapScriptableObject.CellType cell;
+  public Color inactiveColor = Color.clear;
+  public Color activeColor = Color.white;
   public int layer;
   public int areaType;
 
@@ -27,6 +29,7 @@ public class MapTileDetails {
   public float colliderHeight;
   public float colliderOffset;
 
+  public bool groundCreate;
   public Material groundMaterial;
   public bool groundUseMapHeight;
   public float groundOffset;
@@ -38,6 +41,8 @@ public class MapTileDetails {
   public Material wallMaterial;
   public float wallOffset;
   public float wallHeight;
+
+  public bool mapUniqueCreate;
 }
 
   public class MapScriptableObject : ScriptableObject {
@@ -250,31 +255,6 @@ public class MapTileDetails {
 
   #endregion
 
-  #region Colors
-
-  public Color GetCellColor(int cellvalue){
-    switch(cellvalue){
-      case (int)CellType.Ground:
-        return Color.clear;
-      case (int)CellType.Wall:
-        return Color.red;
-      case (int)CellType.Empty:
-        return Color.blue;
-      case (int)CellType.WallAlt:
-        return Color.grey;
-      case (int)CellType.Pitfall:
-        return Color.magenta;
-      case (int)CellType.GroundAlt:
-        return Color.grey;
-    }
-    return Color.white;
-  }
-
-  public Color GetCellDragColor(int cellvalue) {
-    if (cellvalue == 0) return Color.white;
-    return GetCellColor(cellvalue);
-  }
-
-  #endregion
-
 }
+
+

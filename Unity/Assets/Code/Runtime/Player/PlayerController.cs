@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour, IWeight, IItem {
   public NavMeshAgent nva { get; private set; }
   public PlayerManager manager { get; private set; }
   public Animator animator { get; private set; }
-  private PlayerAbility[] abilities;
+  public PlayerAbility[] abilities { get; private set; }
 
   private Vector3 velocity; // we store our own velocity bbi
 

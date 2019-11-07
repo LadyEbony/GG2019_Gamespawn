@@ -9,6 +9,9 @@ using GameSpawn;
 /// </summary>
 public abstract class Interactive: InteractiveBase, IInteractive {
 
+  public int disablePlayer = 0;
+  public int disableGame = 0;
+  
   public virtual void OnEnable() {
     GlobalTypeList<Interactive>.Add(this);
   }
@@ -16,6 +19,8 @@ public abstract class Interactive: InteractiveBase, IInteractive {
   public virtual void OnDisable() {
     GlobalTypeList<Interactive>.Remove(this);
   }
+
+  public virtual bool IsPlayerInteractable => disablePlayer == 0;
 
   public virtual void Select(PlayerController pc){
     

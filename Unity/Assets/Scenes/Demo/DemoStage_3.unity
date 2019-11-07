@@ -12856,26 +12856,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3524073287148109200, guid: 0ddeec5e3b79af24dbbbfa4cfd6717dc,
-        type: 3}
-      propertyPath: m_textInfo.characterCount
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3524073287148109200, guid: 0ddeec5e3b79af24dbbbfa4cfd6717dc,
-        type: 3}
-      propertyPath: m_textInfo.wordCount
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3524073287148109200, guid: 0ddeec5e3b79af24dbbbfa4cfd6717dc,
-        type: 3}
-      propertyPath: m_textInfo.lineCount
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3524073287148109200, guid: 0ddeec5e3b79af24dbbbfa4cfd6717dc,
-        type: 3}
-      propertyPath: m_textInfo.pageCount
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3524073286993090844, guid: 0ddeec5e3b79af24dbbbfa4cfd6717dc,
         type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -12899,6 +12879,26 @@ PrefabInstance:
     - target: {fileID: 3524073286993090844, guid: 0ddeec5e3b79af24dbbbfa4cfd6717dc,
         type: 3}
       propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3524073287148109200, guid: 0ddeec5e3b79af24dbbbfa4cfd6717dc,
+        type: 3}
+      propertyPath: m_textInfo.characterCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3524073287148109200, guid: 0ddeec5e3b79af24dbbbfa4cfd6717dc,
+        type: 3}
+      propertyPath: m_textInfo.wordCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3524073287148109200, guid: 0ddeec5e3b79af24dbbbfa4cfd6717dc,
+        type: 3}
+      propertyPath: m_textInfo.lineCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3524073287148109200, guid: 0ddeec5e3b79af24dbbbfa4cfd6717dc,
+        type: 3}
+      propertyPath: m_textInfo.pageCount
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -15031,7 +15031,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_BuildHeightMesh: 0
-  m_NavMeshData: {fileID: 23800000, guid: 41ebaacef65730943bd5996492a2c6b0, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 3433abb9c0d610d4d9a098b54e8ab508, type: 2}
 --- !u!4 &1777355503
 Transform:
   m_ObjectHideFlags: 0
