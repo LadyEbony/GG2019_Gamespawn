@@ -15,6 +15,7 @@ public abstract class PlayerAbility : MonoBehaviour {
   public PlayerController player { get; private set; }
 
   public virtual void Awake(){
+    Debug.Log(this);
     interactive = GetComponentInParent<InteractiveAbility>();
     player = GetComponentInParent<PlayerController>();
   }

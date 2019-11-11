@@ -318,6 +318,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 537a3fa9125e7204f841226bb3e25d76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  touchSprite: {fileID: 21300000, guid: 8881fdd0dd1e7804880c2f5770e83468, type: 3}
 --- !u!1 &966973183574193122
 GameObject:
   m_ObjectHideFlags: 0
@@ -396,6 +397,9 @@ MonoBehaviour:
   handTransform: {fileID: 6430018901493156645}
   throwForce: 5
   throwTimer: 0.25
+  grabSprite: {fileID: 21300000, guid: e53315911336836468c21fcc098fdd12, type: 3}
+  dropSprite: {fileID: 21300000, guid: eca33fe45ab03264187f114a07c3012b, type: 3}
+  throwSprite: {fileID: 21300000, guid: 766abdca83d39cb40b394ae33fc0200d, type: 3}
 --- !u!1 &1341822387772676690
 GameObject:
   m_ObjectHideFlags: 0
@@ -600,7 +604,7 @@ GameObject:
   - component: {fileID: 1203044397895659284}
   - component: {fileID: 144612870643117038}
   m_Layer: 0
-  m_Name: Engineer
+  m_Name: Maribel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

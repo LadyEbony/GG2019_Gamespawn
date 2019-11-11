@@ -18,7 +18,134 @@ MonoBehaviour:
   height: 2
   cellsize: 1
   cells: 0000000000000000000000000000000000000000000000000000000000000000
-  display: 1
+  display: 0
+  details:
+  - cell: 0
+    inactiveColor: {r: 0, g: 0, b: 0, a: 0}
+    activeColor: {r: 1, g: 1, b: 1, a: 1}
+    layer: 0
+    areaType: 0
+    colliderCreate: 0
+    colliderHeightUseMapHeight: 0
+    colliderHeight: 0
+    colliderOffset: 0
+    groundCreate: 0
+    groundMaterial: {fileID: 0}
+    groundUseMapHeight: 0
+    groundOffset: 0
+    wallCreate: 0
+    wallInvert: 0
+    wallUseMapHeight: 0
+    wallScaleUVHeight: 0
+    wallMaterial: {fileID: 0}
+    wallOffset: 0
+    wallHeight: 0
+    mapUniqueCreate: 0
+  - cell: 1
+    inactiveColor: {r: 0, g: 0, b: 0, a: 0}
+    activeColor: {r: 1, g: 1, b: 1, a: 1}
+    layer: 0
+    areaType: 0
+    colliderCreate: 0
+    colliderHeightUseMapHeight: 0
+    colliderHeight: 0
+    colliderOffset: 0
+    groundCreate: 0
+    groundMaterial: {fileID: 0}
+    groundUseMapHeight: 0
+    groundOffset: 0
+    wallCreate: 0
+    wallInvert: 0
+    wallUseMapHeight: 0
+    wallScaleUVHeight: 0
+    wallMaterial: {fileID: 0}
+    wallOffset: 0
+    wallHeight: 0
+    mapUniqueCreate: 0
+  - cell: 2
+    inactiveColor: {r: 0, g: 0, b: 0, a: 0}
+    activeColor: {r: 1, g: 1, b: 1, a: 1}
+    layer: 0
+    areaType: 0
+    colliderCreate: 0
+    colliderHeightUseMapHeight: 0
+    colliderHeight: 0
+    colliderOffset: 0
+    groundCreate: 0
+    groundMaterial: {fileID: 0}
+    groundUseMapHeight: 0
+    groundOffset: 0
+    wallCreate: 0
+    wallInvert: 0
+    wallUseMapHeight: 0
+    wallScaleUVHeight: 0
+    wallMaterial: {fileID: 0}
+    wallOffset: 0
+    wallHeight: 0
+    mapUniqueCreate: 0
+  - cell: 3
+    inactiveColor: {r: 0, g: 0, b: 0, a: 0}
+    activeColor: {r: 1, g: 1, b: 1, a: 1}
+    layer: 0
+    areaType: 0
+    colliderCreate: 0
+    colliderHeightUseMapHeight: 0
+    colliderHeight: 0
+    colliderOffset: 0
+    groundCreate: 0
+    groundMaterial: {fileID: 0}
+    groundUseMapHeight: 0
+    groundOffset: 0
+    wallCreate: 0
+    wallInvert: 0
+    wallUseMapHeight: 0
+    wallScaleUVHeight: 0
+    wallMaterial: {fileID: 0}
+    wallOffset: 0
+    wallHeight: 0
+    mapUniqueCreate: 0
+  - cell: 4
+    inactiveColor: {r: 0, g: 0, b: 0, a: 0}
+    activeColor: {r: 1, g: 1, b: 1, a: 1}
+    layer: 0
+    areaType: 0
+    colliderCreate: 0
+    colliderHeightUseMapHeight: 0
+    colliderHeight: 0
+    colliderOffset: 0
+    groundCreate: 0
+    groundMaterial: {fileID: 0}
+    groundUseMapHeight: 0
+    groundOffset: 0
+    wallCreate: 0
+    wallInvert: 0
+    wallUseMapHeight: 0
+    wallScaleUVHeight: 0
+    wallMaterial: {fileID: 0}
+    wallOffset: 0
+    wallHeight: 0
+    mapUniqueCreate: 0
+  - cell: 5
+    inactiveColor: {r: 0, g: 0, b: 0, a: 0}
+    activeColor: {r: 1, g: 1, b: 1, a: 1}
+    layer: 0
+    areaType: 0
+    colliderCreate: 0
+    colliderHeightUseMapHeight: 0
+    colliderHeight: 0
+    colliderOffset: 0
+    groundCreate: 0
+    groundMaterial: {fileID: 0}
+    groundUseMapHeight: 0
+    groundOffset: 0
+    wallCreate: 0
+    wallInvert: 0
+    wallUseMapHeight: 0
+    wallScaleUVHeight: 0
+    wallMaterial: {fileID: 0}
+    wallOffset: 0
+    wallHeight: 0
+    mapUniqueCreate: 0
   baseGroundGameobject: {fileID: 0}
   baseWallGameobject: {fileID: 0}
   basePitfallGameobject: {fileID: 0}

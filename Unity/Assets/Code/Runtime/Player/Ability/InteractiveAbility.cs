@@ -16,7 +16,6 @@ public class InteractiveAbility : PlayerAbility {
   /// </summary>
   public Interactive focus { get { return _focus; } private set { _focus = value; } }
 
-
   [Header("Interactive Types")]
   private Dictionary<Type, int> _interactTargets;
   private Dictionary<Type, int> interactTargets{
@@ -39,6 +38,19 @@ public class InteractiveAbility : PlayerAbility {
       }
       return __INTERACT__TYPES__;
     }
+  }
+
+  public List<System.Func<Sprite>> lcControl, rcControl, eControl;
+  public List<System.Func<Sprite>>[] controls;
+
+  public override void Awake() {
+    base.Awake();
+
+    lcControl = new List<System.Func<Sprite>>();
+    rcControl = new List<System.Func<Sprite>>();
+    eControl = new List<System.Func<Sprite>>();
+
+    controls = new [] { lcControl, rcControl, eControl };
   }
 
   public override void UpdateSimulate(bool selected) {
@@ -91,6 +103,11 @@ public class InteractiveAbility : PlayerAbility {
     if (focus != null){
       focus.Select(pc);
     }
+
+
+    // Control UI
+    if (selected)
+      ControlUI.Instance.ControlUpdate(controls);
   }
 
   /// <summary>

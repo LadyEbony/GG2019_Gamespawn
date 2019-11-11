@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WallAbility : PlayerAbility
-{
+public class WallAbility : PlayerAbility {
+
+  public Sprite touchSprite;
 
   private void OnEnable() {
     interactive.EnableInteraction(typeof(Button), typeof(Lever));
+    interactive.lcControl.Add(ControlSimulate);
   }
 
   private void OnDisable() {
     interactive.DisableInteraction(typeof(Button), typeof(Lever));
+    interactive.rcControl.Add(ControlSimulate);
   }
 
   public override void FixedSimulate(bool selected) {
@@ -22,5 +25,13 @@ public class WallAbility : PlayerAbility
       }
     }
 
+  }
+
+  private Sprite ControlSimulate(){
+    var f = interactive.focus;
+    if (f != null && f is WallInteractive){
+      return touchSprite;
+    }
+    return null;
   }
 }

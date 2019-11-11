@@ -117,12 +117,23 @@ public class ItemAbility : PlayerAbility {
   [SerializeField] private float throwTimer;
   private bool throwing = false;
 
+  [Header("Control UI")]
+  public Sprite grabSprite;
+  public Sprite dropSprite;
+  public Sprite throwSprite;
+
   private void OnEnable() {
     interactive.EnableInteraction(typeof(Item));
+
+    interactive.lcControl.Add(ControlLCSimulate);
+    interactive.rcControl.Add(ControlRCSimulate);
   }
 
   private void OnDisable() {
     interactive.DisableInteraction(typeof(Item));
+
+    interactive.lcControl.Remove(ControlLCSimulate);
+    interactive.rcControl.Remove(ControlRCSimulate);
   }
 
   public override void UpdateSimulate(bool selected) {
@@ -176,6 +187,26 @@ public class ItemAbility : PlayerAbility {
     }
   }
 
+  private Sprite ControlLCSimulate(){
+    if (ItemHolder.Has(this)){
+      return dropSprite;
+    }
+
+    var f = interactive.focus;
+    if (f != null && f is Item){
+      return grabSprite;
+    }
+
+    return null;
+  }
+
+  private Sprite ControlRCSimulate(){
+    if (ItemHolder.Has(this)){
+      return throwSprite;
+    }
+
+    return null;
+  }
 
   private void Pickup(PlayerController pc) {
     var act = interactive.focus;

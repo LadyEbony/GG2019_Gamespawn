@@ -91,7 +91,7 @@ GameObject:
   - component: {fileID: 124346152331572579}
   - component: {fileID: 124346152331572577}
   m_Layer: 0
-  m_Name: Logic
+  m_Name: Renko
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -162,14 +162,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60f6da4279e3de849a41f647c7087194, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MouseOveride: {fileID: 0}
-  SprintMultiplier: 1.5
-  DisableInput: 0
-  DisableMovement: 0
-  DisableRotation: 0
-  DisableSwitch: 0
-  disableNavMesh: 0
-  disableRenderer: 0
+  mouseOveride: {fileID: 0}
+  sprintModifier: 1.5
+  disableMovement: 0
+  disableRotation: 0
+  _disableNavMesh: 0
+  _disableRenderer: 0
 --- !u!114 &124346152331572577
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -228,6 +226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 537a3fa9125e7204f841226bb3e25d76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  touchSprite: {fileID: 21300000, guid: 8881fdd0dd1e7804880c2f5770e83468, type: 3}
 --- !u!1 &124346153098285200
 GameObject:
   m_ObjectHideFlags: 0
@@ -275,6 +274,9 @@ MonoBehaviour:
   handTransform: {fileID: 124346153603993167}
   throwForce: 5
   throwTimer: 0.25
+  grabSprite: {fileID: 21300000, guid: e53315911336836468c21fcc098fdd12, type: 3}
+  dropSprite: {fileID: 21300000, guid: eca33fe45ab03264187f114a07c3012b, type: 3}
+  throwSprite: {fileID: 21300000, guid: 766abdca83d39cb40b394ae33fc0200d, type: 3}
 --- !u!1 &124346153462548094
 GameObject:
   m_ObjectHideFlags: 0
@@ -321,7 +323,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ff1f997f1f79d348826fb1a33030f42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  focus: {fileID: 0}
+  _focus: {fileID: 0}
   interactiveBounds: {fileID: 124346152059392901}
 --- !u!1 &124346153603993160
 GameObject:
