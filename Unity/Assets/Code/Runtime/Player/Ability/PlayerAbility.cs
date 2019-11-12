@@ -15,7 +15,6 @@ public abstract class PlayerAbility : MonoBehaviour {
   public PlayerController player { get; private set; }
 
   public virtual void Awake(){
-    Debug.Log(this);
     interactive = GetComponentInParent<InteractiveAbility>();
     player = GetComponentInParent<PlayerController>();
   }
@@ -31,4 +30,5 @@ public abstract class PlayerAbility : MonoBehaviour {
   /// </summary>
   /// <param name="pc"></param>
   public virtual void FixedSimulate(bool selected) { }
+
 }

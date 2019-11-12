@@ -124,16 +124,10 @@ public class ItemAbility : PlayerAbility {
 
   private void OnEnable() {
     interactive.EnableInteraction(typeof(Item));
-
-    interactive.lcControl.Add(ControlLCSimulate);
-    interactive.rcControl.Add(ControlRCSimulate);
   }
 
   private void OnDisable() {
     interactive.DisableInteraction(typeof(Item));
-
-    interactive.lcControl.Remove(ControlLCSimulate);
-    interactive.rcControl.Remove(ControlRCSimulate);
   }
 
   public override void UpdateSimulate(bool selected) {
@@ -168,6 +162,10 @@ public class ItemAbility : PlayerAbility {
       if (l_input.IsDown()) {    
         Pickup(pc);
       }
+
+      var f = interactive.focus as Item;
+      ControlUI.Instance.lcInput.SetSprite(f ? grabSprite : null);
+      ControlUI.Instance.rcInput.SetSprite(null);
     }
     // Has item
     else {  
@@ -184,28 +182,10 @@ public class ItemAbility : PlayerAbility {
       if (throwing && r_input.IsUp()){
         Throw(pc);
       }
+
+      ControlUI.Instance.lcInput.SetSprite(dropSprite);
+      ControlUI.Instance.rcInput.SetSprite(throwSprite);
     }
-  }
-
-  private Sprite ControlLCSimulate(){
-    if (ItemHolder.Has(this)){
-      return dropSprite;
-    }
-
-    var f = interactive.focus;
-    if (f != null && f is Item){
-      return grabSprite;
-    }
-
-    return null;
-  }
-
-  private Sprite ControlRCSimulate(){
-    if (ItemHolder.Has(this)){
-      return throwSprite;
-    }
-
-    return null;
   }
 
   private void Pickup(PlayerController pc) {
@@ -223,7 +203,7 @@ public class ItemAbility : PlayerAbility {
     }
   }
 
-  private void Drop(PlayerController pc) {
+  public void Drop(PlayerController pc) {
     // remove pre throw state
     if (throwing) {
       throwing = false;

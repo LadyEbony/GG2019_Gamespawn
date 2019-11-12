@@ -40,19 +40,6 @@ public class InteractiveAbility : PlayerAbility {
     }
   }
 
-  public List<System.Func<Sprite>> lcControl, rcControl, eControl;
-  public List<System.Func<Sprite>>[] controls;
-
-  public override void Awake() {
-    base.Awake();
-
-    lcControl = new List<System.Func<Sprite>>();
-    rcControl = new List<System.Func<Sprite>>();
-    eControl = new List<System.Func<Sprite>>();
-
-    controls = new [] { lcControl, rcControl, eControl };
-  }
-
   public override void UpdateSimulate(bool selected) {
     
   }
@@ -104,10 +91,8 @@ public class InteractiveAbility : PlayerAbility {
       focus.Select(pc);
     }
 
-
     // Control UI
-    if (selected)
-      ControlUI.Instance.ControlUpdate(controls);
+    ControlUI.Instance.ControlReset();
   }
 
   /// <summary>

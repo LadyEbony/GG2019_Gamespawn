@@ -10,19 +10,24 @@ public class Item : Interactive, IItem, IWeight {
   public new Rigidbody rigidbody { get; private set; }
 
   public Material materialInner { get; private set; }
-  public new ParticleSystem particleSystem { get; private set; }
+  public Material materialShell { get; private set; }
+
+  public SpriteRenderer spriteRendererMain { get; private set; }
+  public SpriteRenderer spriteRendererInner { get; private set; }
 
   // Special events that occur when the items are picked up
   private InteractiveEvent pickupEvent;
   private InteractiveEvent dropEvent;
 
-  private bool weighted;
   private PlayerController selectedpc;
   private Color selectedcolor;
 
+  private Color standardInnerColor;
+  private Color standardShellColor;
   [Header("Selection")]
-  public Color standardColor = new Color(1, 1, 1);
-  public Color weightedColor = new Color(1, 1, 1);
+  public Color alternateInnerColor = new Color(1, 1, 1);
+  public Color alternateShellColor = new Color(1, 1, 1);
+  public float innerRatio = 0.5f;
   public float fadeTime = 0.25f;
   private float fadeDuration = 0.0f;
 
@@ -30,16 +35,32 @@ public class Item : Interactive, IItem, IWeight {
   public float bounceTime = 0.25f;
   public float bounceHeight = 0.5f;
 
+  [Header("Additional")]
+  public bool weighted;
+  public bool duplicate;
+
   public override void Awake() {
     base.Awake();
 
     rigidbody = GetComponent<Rigidbody>();
 
     var mesht = transform.Find("Inner");
-    if (mesht) {
+    if (mesht) { 
       materialInner = mesht.GetComponent<MeshRenderer>().material;
+      standardInnerColor = materialInner.color;
     }
-    particleSystem = GetComponentInChildren<ParticleSystem>(true);
+
+    var meshs = transform.Find("Shell");
+    if (meshs) { 
+      materialShell = meshs.GetComponent<MeshRenderer>().material;
+      standardShellColor = materialShell.color;
+    }
+
+    var spriter = transform.Find("Aura");
+    if (spriter){
+      spriteRendererMain = spriter.GetComponent<SpriteRenderer>();
+      spriteRendererInner = spriter.GetChild(0).GetComponent<SpriteRenderer>();
+    }
 
     var events = GetComponents<InteractiveEvent>();
     if (events.Length >= 1) pickupEvent = events[0];
@@ -48,29 +69,20 @@ public class Item : Interactive, IItem, IWeight {
 
   private void Update() {
     // Box color
-    if (weighted){
-      materialInner.color = weightedColor;
-    } else {
-      materialInner.color = standardColor;
+    materialInner.color = weighted ? alternateInnerColor : standardInnerColor;
+    materialShell.color = duplicate ? alternateShellColor : standardShellColor;
+
+    if (duplicate){
+      
     }
 
     // Selection particles
-    if (particleSystem) {
-      var pcolor = Color.Lerp(Color.clear, selectedcolor, fadeDuration / fadeTime);
+    var pcolor = Color.Lerp(Color.clear, selectedcolor, fadeDuration / fadeTime);
+    spriteRendererMain.color = pcolor;
 
-      var particles = new ParticleSystem.Particle[12];
-      var particlesize = particleSystem.GetParticles(particles);
-      
-      for(var i = 0; i < particlesize; i++){
-        particles[i].startColor = pcolor;
-      }
-
-      particleSystem.SetParticles(particles, particlesize);
-
-      var pmain = particleSystem.main;
-      pmain.startColor = pcolor;
-
-    }
+    pcolor = Color.Lerp(pcolor, new Color(1f, 1f, 1f, pcolor.a), innerRatio);
+    spriteRendererInner.color = pcolor;
+    
 
     // Out of bounds
     if (transform.position.y <= -1f){

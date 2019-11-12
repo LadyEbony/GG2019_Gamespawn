@@ -22,20 +22,25 @@ public class ControlUI : MonoBehaviour {
     }
 
     public void SetSprite(Sprite s){
+      gameObject.SetActive(true);
+
       if (s != null){
         iconImage.sprite = s;
         iconImage.color = Color.white;
         buttonImage.color = Color.white;
-      } else {
-        iconImage.sprite = null;
-        iconImage.color = Color.clear;
-        buttonImage.color = new Color(0.5f, 0.5f, 0.5f, 1f);
       }
+    }
+
+    public void Reset(){
+      iconImage.sprite = null;
+      iconImage.color = Color.clear;
+      buttonImage.color = new Color(0.5f, 0.5f, 0.5f, 1f);
+
+      gameObject.SetActive(false);
     }
   }
 
   public ControlUnit lcInput, rcInput, eInput;
-  private ControlUnit[] inputs;
 
   private void Awake() {
     Instance = this;
@@ -43,24 +48,12 @@ public class ControlUI : MonoBehaviour {
     lcInput = new ControlUnit(transform.Find("LB").gameObject);
     rcInput = new ControlUnit(transform.Find("RB").gameObject);
     eInput = new ControlUnit(transform.Find("E").gameObject);
-
-    inputs = new [] {lcInput, rcInput, eInput};
   }
 
-  // Update is called once per frame
-  public void ControlUpdate(List<System.Func<Sprite>>[] controlFuncs) {
-    for(var i = 0; i < inputs.Length; i++){
-      var unit = inputs[i];
-      var funcs = controlFuncs[i];
-
-      unit.gameObject.SetActive(funcs.Count > 0);
-
-      Sprite s = null;
-      foreach(var f in funcs){
-        s = f();
-        if (s != null) break;
-      }
-      unit.SetSprite(s);
-    }
+  public void ControlReset(){
+    lcInput.Reset();
+    rcInput.Reset();
+    eInput.Reset();
   }
+
 }
