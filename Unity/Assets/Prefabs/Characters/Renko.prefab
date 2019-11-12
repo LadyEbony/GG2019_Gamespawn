@@ -45,7 +45,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   originalItem: {fileID: 0}
   duplicateItem: {fileID: 0}
+  linkPrefab: {fileID: 4343042889039561191, guid: 2f53e16ff0b18874ab0606db05383e74,
+    type: 3}
+  linkSpeed: 10
   createSprite: {fileID: 21300000, guid: aacfb8502c6a68b428d73620030ed8d7, type: 3}
+  createFailSprite: {fileID: 21300000, guid: 15e098ff88f46324d972598420f03c28, type: 3}
   destroySprite: {fileID: 21300000, guid: b2ded36095bf49848a9eb679b86ac81f, type: 3}
 --- !u!1 &54662156435204823
 GameObject:

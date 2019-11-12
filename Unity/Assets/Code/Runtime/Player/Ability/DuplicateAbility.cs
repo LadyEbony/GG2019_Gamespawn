@@ -17,6 +17,7 @@ public class DuplicateAbility : PlayerAbility {
 
   [Header("Sprites")]
   public Sprite createSprite;
+  public Sprite createFailSprite;
   public Sprite destroySprite;
 
   public override void Awake() {
@@ -24,14 +25,6 @@ public class DuplicateAbility : PlayerAbility {
 
     itemAbility = interactive.GetComponentInChildren<ItemAbility>();
     if (itemAbility == null) Debug.LogErrorFormat("{0} does not have an item ability.", player);
-  }
-
-  private void OnEnable() {
-    
-  }
-
-  private void OnDisable() {
-    
   }
 
   public override void UpdateSimulate(bool selected) {
@@ -58,10 +51,10 @@ public class DuplicateAbility : PlayerAbility {
 
         // we must be holding it
         Item del;
-        if (heldItem == duplicateItem) del = duplicateItem;
-        else if (heldItem == originalItem) del = originalItem;
+        if (heldItem == duplicateItem) del = originalItem;
+        else if (heldItem == originalItem) del = duplicateItem;
         else {
-          ControlUI.Instance.eInput.SetSprite(null);
+          ControlUI.Instance.eInput.SetSprite(createFailSprite);
           return;
         }
 
