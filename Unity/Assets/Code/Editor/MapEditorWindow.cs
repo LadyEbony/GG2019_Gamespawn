@@ -585,10 +585,11 @@ public class MapEditorWindow : EditorWindow {
         var mesh = new Mesh();
         var boxes = new List<Box>();
         var vertexCount = 0;
+        var offset = Vector3.zero;
 
         if (details.groundCreate){
           boxes = GetGroundBoxes(tiles);
-          vertexCount = AdjustGroundBoxes(boxes, details, 0);
+          offset = AdjustGroundBoxes(boxes, details, ref vertexCount);
 
           AddVertices(mesh, boxes);
           BuildMainMesh(mesh, boxes, 0);
@@ -596,7 +597,7 @@ public class MapEditorWindow : EditorWindow {
 
         if (details.wallCreate) {
           var wallboxes = GetWallBoxes(tiles, details.wallInvert);
-          vertexCount = AdjustWallBoxes(wallboxes, details, vertexCount);
+          AdjustWallBoxes(wallboxes, details, offset, ref vertexCount);
 
           AddVertices(mesh, wallboxes);
           BuildMainMesh(mesh, wallboxes, 1);
@@ -608,6 +609,7 @@ public class MapEditorWindow : EditorWindow {
         go.layer = details.layer;
 
         gotransform.parent = parent;
+        gotransform.position = offset;
 
         var mats = new List<Material>();
         if (details.groundCreate) mats.Add(details.groundMaterial);
@@ -630,7 +632,7 @@ public class MapEditorWindow : EditorWindow {
             size.y = colliderHeight;
 
             itemtransform.parent = gotransform;
-            itemtransform.position = corner + colliderOffset;
+            itemtransform.position = corner + offset + colliderOffset;
 
             var collider = item.GetComponent<BoxCollider>();
             collider.size = size;
@@ -884,9 +886,11 @@ public class MapEditorWindow : EditorWindow {
     return boxes;
   }
 
-  int AdjustGroundBoxes(List<Box> boxes, MapTileDetails details, int counter) {
+  Vector3 AdjustGroundBoxes(List<Box> boxes, MapTileDetails details, ref int counter) {
     var conversion = new Dictionary<int, int>();
     var groundPos = details.groundOffset + (details.groundUseMapHeight ? instance.height : 0f);
+
+    var offset = Vector3.zero;
 
     foreach(var b in boxes){
       var corners = b.corners;
@@ -901,6 +905,8 @@ public class MapEditorWindow : EditorWindow {
         if (!conversion.TryGetValue(index, out value)) {
           corner.vertex = counter++;
           conversion.Add(index, corner.vertex);
+
+          offset += corner.position; 
         } else {
           corner.vertex = value;
         }
@@ -908,10 +914,18 @@ public class MapEditorWindow : EditorWindow {
       b.size = b.topRight.position - b.bottomLeft.position;
     }
 
-    return counter;
+    offset /= counter;
+
+    foreach (var b in boxes) {
+      foreach(var c in b.corners){
+        c.position -= offset;
+      }
+    }
+
+    return offset;
   }
 
-  int AdjustWallBoxes(List<Box> boxes, MapTileDetails details, int counter){
+  void AdjustWallBoxes(List<Box> boxes, MapTileDetails details, Vector3 offset, ref int counter){
     var total = (instance.length + 1) * (instance.width + 1);
 
     var bottomHeight = details.wallOffset;
@@ -926,8 +940,8 @@ public class MapEditorWindow : EditorWindow {
         var corner = corners[i];
         var index = corner.index;
 
-        if (i < 2) corner.position = CornerToPosition(index, bottomHeight);
-        else corner.position = CornerToPosition(index % total, topHeight);
+        if (i < 2) corner.position = CornerToPosition(index, bottomHeight) - offset;
+        else corner.position = CornerToPosition(index % total, topHeight) - offset;
         corner.vertex = counter++;
       }
       b.size = b.topRight.position - b.bottomLeft.position;
@@ -947,8 +961,6 @@ public class MapEditorWindow : EditorWindow {
       }
       distance += d;
     }
-
-    return counter;
   }
 
   void AddVertices(Mesh mesh, List<Box> boxes) {

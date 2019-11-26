@@ -8,6 +8,7 @@ using UnityEngine.AI;
 public class Item : Interactive, IItem, IWeight {
   
   public new Rigidbody rigidbody { get; private set; }
+  public new BoxCollider collider { get; private set; }
 
   public Material materialInner { get; private set; }
   public Material materialShell { get; private set; }
@@ -43,6 +44,7 @@ public class Item : Interactive, IItem, IWeight {
     base.Awake();
 
     rigidbody = GetComponent<Rigidbody>();
+    collider = GetComponent<BoxCollider>();
 
     var mesht = transform.Find("Inner");
     if (mesht) { 
@@ -246,5 +248,7 @@ public class Item : Interactive, IItem, IWeight {
 
     return Quaternion.LookRotation(direction * Vector3.forward, final);
   }
+
+  public override Vector3 CenterPosition => collider.bounds.center;
 
 }

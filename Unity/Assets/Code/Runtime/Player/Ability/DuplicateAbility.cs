@@ -11,9 +11,10 @@ public class DuplicateAbility : PlayerAbility {
 
   [Header("Particles")]
   public GameObject linkPrefab;
-  public float linkSpeed = 10f;
   private Transform linkTransform;
-  private Transform linkDestination;
+  public float linkTime = 1f;
+  public float linkCurrentTime = 0f;
+  public bool linkIncrementing = true;
 
   [Header("Sprites")]
   public Sprite createSprite;
@@ -29,10 +30,27 @@ public class DuplicateAbility : PlayerAbility {
 
   public override void UpdateSimulate(bool selected) {
     if (originalItem){
-      linkTransform.position = Vector3.MoveTowards(linkTransform.position, linkDestination.position, linkSpeed * Time.deltaTime);
+      var start = originalItem.CenterPosition;
+      var end = duplicateItem.CenterPosition;
 
-      if (Vector3.SqrMagnitude(linkTransform.position - linkDestination.position) < 0.25f){
-        linkDestination = originalItem.transform == linkDestination ? duplicateItem.transform : originalItem.transform;
+      linkTransform.position = linkIncrementing ? start : end;
+      linkIncrementing = !linkIncrementing;
+
+      return;
+      linkTransform.position = Vector3.Lerp(start, end, linkCurrentTime / linkTime);
+
+      if (linkIncrementing){
+        linkCurrentTime += Time.deltaTime;
+        if (linkCurrentTime >= linkTime){
+          linkCurrentTime = linkTime;
+          linkIncrementing = false;
+        }
+      } else {
+        linkCurrentTime -= Time.deltaTime;
+        if (linkCurrentTime <= 0){
+          linkCurrentTime = 0f;
+          linkIncrementing = true;
+        }
       }
     }
   }
@@ -43,53 +61,42 @@ public class DuplicateAbility : PlayerAbility {
     var pc = player;
     var heldItem = ItemHolder.Has(itemAbility);
 
-    if (heldItem){
-      var e_input = PlayerInput.instance.eInput;
-      
-      // dup exists, so we are deleting it.
-      if (duplicateItem){
+    var e_input = PlayerInput.instance.eInput;
 
-        // we must be holding it
-        Item del;
-        if (heldItem == duplicateItem) del = originalItem;
-        else if (heldItem == originalItem) del = duplicateItem;
-        else {
-          ControlUI.Instance.eInput.SetSprite(createFailSprite);
-          return;
-        }
+    // dup exists, we deleting
+    if (duplicateItem) {
+      if (e_input.IsDown()){
+        // forcefully drop it from the holder
+        var h = ItemHolder.Has(duplicateItem);
+        if (h) h.Drop(h.player);
 
-        if (e_input.IsDown()){
-          // forcefully drop it from the holder
-          var h = ItemHolder.Has(del);
-          if (h) h.Drop(h.player);
-          
-          originalItem.duplicate = false;
-          duplicateItem.duplicate = false;
+        Destroy(duplicateItem.gameObject);
+        Destroy(linkTransform.gameObject, 1f);
 
-          Destroy(del.gameObject);
-          Destroy(linkTransform.gameObject, 1f);
-
-          originalItem = null;
-          duplicateItem = null;
-        }
-        ControlUI.Instance.eInput.SetSprite(destroySprite);
-      } else {
-        if (e_input.IsDown()){
-          originalItem = heldItem;
-          duplicateItem = Instantiate(heldItem.gameObject).GetComponent<Item>();
-          duplicateItem.Drop(pc);
-
-          originalItem.duplicate = true;
-          duplicateItem.duplicate = true;
-
-          linkTransform = Instantiate(linkPrefab, originalItem.transform.position, Quaternion.identity).transform;
-          linkDestination = duplicateItem.transform;
-        }
-        ControlUI.Instance.eInput.SetSprite(createSprite);
+        originalItem = null;
+        duplicateItem = null;
       }
+
+      ControlUI.Instance.eInput.SetSprite(destroySprite);
+    }
+    // creating dup 
+    else if (heldItem) {
+      if (e_input.IsDown()) {
+        originalItem = heldItem;
+        duplicateItem = Instantiate(heldItem.gameObject).GetComponent<Item>();
+        duplicateItem.Drop(pc);
+
+        //originalItem.duplicate = false;
+        duplicateItem.duplicate = true;
+
+        linkTransform = Instantiate(linkPrefab, originalItem.transform.position, Quaternion.identity).transform;
+        linkIncrementing = true;
+      }
+      ControlUI.Instance.eInput.SetSprite(createSprite);
     } else {
       ControlUI.Instance.eInput.SetSprite(null);
     }
+
   }
 
 }

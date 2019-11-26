@@ -27,4 +27,12 @@ public static class GameObjectExtender{
     return item;
   }
 
+  public static Transform[] FindChildrenWithName(Transform parent, string name){
+    var list = new List<Transform>();
+    foreach(Transform child in parent){
+      if (child.name == name) list.Add(child);
+    }
+    return list.ToArray();
+  }
+
 }

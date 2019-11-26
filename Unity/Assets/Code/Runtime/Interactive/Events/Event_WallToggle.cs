@@ -5,41 +5,49 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public class Event_WallToggle : InteractiveEvent {
-  public GameObject[] Walls;
-  public GameObject LaserPrefab;
-  public float time = 0.25f;
-  public float height = 3.0f;
+
+  // Animations
+  private new GameObject collider;
+  private Transform wall;
+  private ParticleSystem gem;
+
+  private Coroutine wallCoroutine;
+
+  public float speed = 12f;
+  public float height = -3f;
+
+  private void Update() {
+    if (Input.GetKeyDown(KeyCode.R)){
+      Interact(null, null);
+    }
+  }
+
+  private void Start() {
+    collider = transform.Find("Collider").gameObject;
+    wall = transform.Find("Wall");
+    gem = transform.Find("Gem").GetComponentInChildren<ParticleSystem>();
+  }
 
   public override void Interact(PlayerController pc, InteractiveBase interactive) {
-    foreach (var wall in Walls) {
-      var collider = wall.GetComponent<Collider>();
-      var state = collider.enabled;
+    var state = collider.activeSelf;
 
-      if (wall.gameObject.layer == LayerMask.NameToLayer("Wall")) {
-        wall.GetComponent<Animator>().Play(state ? "Hide" : "Show");
-      } else {
-        wall.GetComponent<Animator>().Play(state ? "Disappear" : "Appear");
-      }
-
-      collider.enabled = !state;
-
-      var mesh = wall.GetComponentInChildren<MeshRenderer>();
-      var comp = Instantiate(LaserPrefab, interactive.transform.position, Quaternion.identity, null).GetComponent<Laser>();
-      comp.initial = interactive.CenterPosition;
-      comp.destination = collider.transform.position;
-      comp.traveltime = time;
-      comp.height = height;
-
-      if (mesh.CompareTag("Teleport")){
-        comp.SetColor(Color.white);
-      } else if (mesh.CompareTag("Exit")){
-        comp.SetColor(Color.green);
-      }
-    }
-
+    collider.SetActive(!state);
     foreach (var surface in NavMeshSurface.activeSurfaces)
       surface.BuildNavMesh();
 
+    if (wallCoroutine != null) StopCoroutine(wallCoroutine);
+    // wall was up, now going down
+    if (state){
+      wallCoroutine = StartCoroutine(WallAnimation(height));
+      gem.Play();
+    } 
+    // wall was down, now going up
+    else {
+      wallCoroutine = StartCoroutine(WallAnimation(0f));
+      gem.Stop();
+    }
+
+    /*
     foreach(var wall in Walls){
       var collider = wall.GetComponent<BoxCollider>();
       var boxes = Physics.OverlapBox(collider.bounds.center, collider.bounds.extents, Quaternion.identity, 1 << LayerMask.NameToLayer("Item"));
@@ -50,7 +58,17 @@ public class Event_WallToggle : InteractiveEvent {
         box.GetComponent<Item>().Bounce(navmeshsize);
       }
     }
+    */
 
+  }
+
+  IEnumerator WallAnimation(float y){
+    var gotopos = new Vector3(0f, y, 0f);
+    while(Vector3.SqrMagnitude(wall.localPosition - gotopos) > 0f){
+      yield return null;
+      wall.localPosition = Vector3.MoveTowards(wall.localPosition, gotopos, speed * Time.deltaTime);
+    }
+    wallCoroutine = null;
   }
 
 }
